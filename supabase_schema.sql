@@ -1,4 +1,5 @@
 -- Supabase Database Schema Setup for Student Attendance Tracker
+-- (Idempotent script: Safe to run multiple times)
 
 -- 1. PROFILES TABLE (extends Supabase auth.users)
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -11,6 +12,12 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 -- Enable RLS on profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can select their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can delete their own profile" ON public.profiles;
 
 -- Create policies for profiles
 CREATE POLICY "Users can select their own profile" 
@@ -45,6 +52,12 @@ CREATE TABLE IF NOT EXISTS public.subjects (
 -- Enable RLS on subjects
 ALTER TABLE public.subjects ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can select their own subjects" ON public.subjects;
+DROP POLICY IF EXISTS "Users can insert their own subjects" ON public.subjects;
+DROP POLICY IF EXISTS "Users can update their own subjects" ON public.subjects;
+DROP POLICY IF EXISTS "Users can delete their own subjects" ON public.subjects;
+
 -- Create policies for subjects
 CREATE POLICY "Users can select their own subjects" 
   ON public.subjects FOR SELECT 
@@ -77,6 +90,12 @@ CREATE TABLE IF NOT EXISTS public.class_types (
 
 -- Enable RLS on class_types
 ALTER TABLE public.class_types ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can select class types of their subjects" ON public.class_types;
+DROP POLICY IF EXISTS "Users can insert class types under their subjects" ON public.class_types;
+DROP POLICY IF EXISTS "Users can update class types of their subjects" ON public.class_types;
+DROP POLICY IF EXISTS "Users can delete class types of their subjects" ON public.class_types;
 
 -- Create policies for class_types (via join checks on subjects)
 CREATE POLICY "Users can select class types of their subjects" 
@@ -135,6 +154,12 @@ CREATE TABLE IF NOT EXISTS public.attendance_records (
 -- Enable RLS on attendance_records
 ALTER TABLE public.attendance_records ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Users can select their own attendance records" ON public.attendance_records;
+DROP POLICY IF EXISTS "Users can insert their own attendance records" ON public.attendance_records;
+DROP POLICY IF EXISTS "Users can update their own attendance records" ON public.attendance_records;
+DROP POLICY IF EXISTS "Users can delete their own attendance records" ON public.attendance_records;
+
 -- Create policies for attendance_records
 CREATE POLICY "Users can select their own attendance records" 
   ON public.attendance_records FOR SELECT 
@@ -169,8 +194,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Drop existing trigger if it exists
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+
 -- Bind trigger
-CREATE OR REPLACE TRIGGER on_auth_user_created
+CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
