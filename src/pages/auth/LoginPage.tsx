@@ -1,14 +1,16 @@
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../../hooks/useAuth"
 import { Button } from "../../components/ui/button"
-import { GraduationCap, ArrowRight, Loader2 } from "lucide-react"
+import { GraduationCap, ArrowRight, Loader2, Eye, EyeOff, AlertCircle } from "lucide-react"
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  rememberMe: z.boolean(),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -16,6 +18,9 @@ type LoginFormValues = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const { login, loading } = useAuth()
   const navigate = useNavigate()
+  const [showPassword, setShowPassword] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [toastMsg, setToastMsg] = useState<string | null>(null)
 
   const {
     register: registerField,
@@ -26,16 +31,37 @@ export default function LoginPage() {
     defaultValues: {
       email: "",
       password: "",
+      rememberMe: true,
     },
   })
 
+  // Human-readable error translator
+  const translateError = (errorStr: string) => {
+    if (errorStr.toLowerCase().includes("invalid login credentials")) {
+      return "Wrong email or password. Please try again."
+    }
+    if (errorStr.toLowerCase().includes("email not confirmed")) {
+      return "Please check your inbox to confirm your email before signing in."
+    }
+    return errorStr
+  }
+
   const onSubmit = async (data: LoginFormValues) => {
+    setErrorMsg(null)
     try {
       await login(data.email, data.password)
       navigate("/")
-    } catch (err) {
-      console.error("Login failed:", err)
+    } catch (err: any) {
+      console.error("Login submission error:", err)
+      const rawMsg = err?.message || "An unexpected authentication error occurred."
+      setErrorMsg(translateError(rawMsg))
     }
+  }
+
+  const triggerForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setToastMsg("Forgot password feature coming soon!")
+    setTimeout(() => setToastMsg(null), 3500)
   }
 
   return (
@@ -57,6 +83,14 @@ export default function LoginPage() {
             Sign in to track your semester attendance
           </p>
         </div>
+
+        {/* Global Error Banner */}
+        {errorMsg && (
+          <div className="flex items-center space-x-2.5 p-3.5 rounded-xl bg-danger/10 border border-danger/20 text-danger text-xs animate-in slide-in-from-top-1">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
         {/* Login Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -80,22 +114,56 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 pl-1">
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              {...registerField("password")}
-              className={`w-full px-4 py-3 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
-                errors.password ? "border-danger focus:ring-danger/50" : "border-border"
-              }`}
-            />
+            <div className="flex justify-between items-center mb-1.5 pl-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Password
+              </label>
+              <a
+                href="#"
+                onClick={triggerForgotPassword}
+                className="text-xs font-medium text-primary hover:underline"
+              >
+                Forgot?
+              </a>
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                {...registerField("password")}
+                className={`w-full px-4 py-3 pr-10 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+                  errors.password ? "border-danger focus:ring-danger/50" : "border-border"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
             {errors.password && (
               <span className="text-xs text-danger mt-1 block pl-1">
                 {errors.password.message}
               </span>
             )}
+          </div>
+
+          {/* Remember Me Toggle */}
+          <div className="flex items-center space-x-2 pl-1 py-1">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              {...registerField("rememberMe")}
+              className="rounded border-border bg-background text-primary focus:ring-primary/50"
+            />
+            <label
+              htmlFor="rememberMe"
+              className="text-xs font-medium text-muted-foreground select-none cursor-pointer"
+            >
+              Remember me on this browser
+            </label>
           </div>
 
           <Button
@@ -125,6 +193,13 @@ export default function LoginPage() {
           </Link>
         </div>
       </div>
+
+      {/* Custom Toast Alert */}
+      {toastMsg && (
+        <div className="fixed bottom-6 right-6 z-50 px-5 py-3 rounded-2xl bg-card border border-border shadow-2xl text-sm font-semibold text-foreground animate-in slide-in-from-bottom-5">
+          {toastMsg}
+        </div>
+      )}
     </div>
   )
 }

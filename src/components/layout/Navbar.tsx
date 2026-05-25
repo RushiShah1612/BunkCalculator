@@ -9,7 +9,7 @@ interface NavbarProps {
 }
 
 export function Navbar({ title }: NavbarProps) {
-  const { user, logout } = useAuth()
+  const { user, profile, logout } = useAuth()
   const [isDark, setIsDark] = useState(() => {
     return document.documentElement.classList.contains("dark")
   })
@@ -67,14 +67,20 @@ export function Navbar({ title }: NavbarProps) {
             <div className="flex items-center space-x-3 pl-2 border-l border-border">
               <div className="hidden md:flex flex-col text-right">
                 <span className="text-sm font-semibold text-foreground">
-                  {user.full_name}
+                  {profile?.full_name || user.email}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {user.semester || "Student"}
+                  {profile?.semester || "Student"}
                 </span>
               </div>
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold border border-primary/20">
-                {user.full_name ? user.full_name.charAt(0) : <User className="w-4 h-4" />}
+                {profile?.full_name ? (
+                  profile.full_name.charAt(0)
+                ) : user.email ? (
+                  user.email.charAt(0).toUpperCase()
+                ) : (
+                  <User className="w-4 h-4" />
+                )}
               </div>
               <Button
                 variant="ghost"

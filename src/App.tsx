@@ -1,7 +1,5 @@
-import { useEffect } from "react"
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom"
-import { useAuth } from "./hooks/useAuth"
-import { useAuthStore } from "./store/authStore"
+import { useAuth, useAuthListener } from "./hooks/useAuth"
 import { LoadingSpinner } from "./components/shared/LoadingSpinner"
 import { Sidebar } from "./components/layout/Sidebar"
 
@@ -17,15 +15,6 @@ import NotFoundPage from "./pages/NotFoundPage"
 // Protected Route Wrapper Component
 function ProtectedRoute() {
   const { user, loading } = useAuth()
-  const { setLoading } = useAuthStore()
-
-  // Simulate verification check on initial load (0.4s)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 400)
-    return () => clearTimeout(timer)
-  }, [setLoading])
 
   if (loading) {
     return <LoadingSpinner fullPage message="Verifying session..." />
@@ -48,14 +37,6 @@ function ProtectedRoute() {
 // Public Route Wrapper (redirects authenticated users away from Login/Register)
 function PublicRoute() {
   const { user, loading } = useAuth()
-  const { setLoading } = useAuthStore()
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false)
-    }, 400)
-    return () => clearTimeout(timer)
-  }, [setLoading])
 
   if (loading) {
     return <LoadingSpinner fullPage message="Loading..." />
@@ -69,6 +50,9 @@ function PublicRoute() {
 }
 
 export default function App() {
+  // Subscribe to supabase auth listener once
+  useAuthListener()
+
   return (
     <BrowserRouter>
       <Routes>
