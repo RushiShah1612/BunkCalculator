@@ -4,7 +4,7 @@ import type { AttendanceRecord, AttendanceStatus } from "../types"
 export function useAttendance() {
   const {
     attendanceRecords,
-    loading,
+    isLoading: loading,
     addAttendanceRecord,
     updateAttendanceRecord,
     deleteAttendanceRecord,
