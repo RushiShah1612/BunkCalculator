@@ -1,84 +1,41 @@
-# Student Attendance Tracker (RollCall)
+# 📅 RollCall — Premium Student Attendance Tracker & Bunk Simulator
 
-A modern, responsive Progressive Web App (PWA) designed for college and university students to track daily attendance, monitor progress, simulate absent/present scenarios, and prevent detentions.
+RollCall is a premium, feature-rich Progressive Web App (PWA) designed for college and university students to track daily attendance, monitor progress, simulate absent/present scenarios, and prevent detentions. 
 
----
-
-## Features
-
-- **Auth & Accounts:** User registration and login utilizing Supabase Auth, along with secure account deletion and password resets.
-- **Subject Management:** Create, edit, and delete subjects with customizable credit counts, semester labels, color tags, and multiple nested class types (e.g. Theory, Lab, Tutorial).
-- **Calculations Engine:** Pure mathematical functions to calculate current percentages, projected statistics, safe bunks available, and sessions needed to restore target attendance.
-- **Log Attendance:** Real-time log calendar allowing attendance entries per class type (PRESENT, ABSENT, CANCELLED, HOLIDAY).
-- **Dashboard Overview:** Displays overall percentage, streak indicators, weekly activity histograms, and today's quick logging actions.
-- **Analytics & Insights:** Responsive Recharts charts (Line, Pie, Bar), attendance intensity heatmaps, custom date-range presets, and CSV downloads.
-- **Profile & Settings:** Custom avatar generation, target percentage updates, daily log alerts/reminders, and data export.
-- **Smart Notifications:** Automated warning triggers when attendance drops near or below target thresholds.
-- **PWA Capabilities:** Desktop and mobile standalone installation with offline asset caching.
-- **Shareable Reports:** Generate public, read-only snapshot links that expire in 7 days to share attendance summaries.
+Built using a modern tech stack—**React, TypeScript, Tailwind CSS, Zustand, and Supabase**—it provides a dark-themed, glassmorphic UI, responsive analytics, and real-time calculations.
 
 ---
 
-## Tech Stack
+## ✨ Features
 
-- **Frontend:** React, TypeScript, Vite
-- **Styling:** Tailwind CSS, Lucide Icons, Recharts
-- **Database & Auth:** Supabase (PostgreSQL, Realtime, Row Level Security)
-- **State Management:** Zustand
-- **PWA:** Service Workers, Web App Manifest
-- **Testing:** Vitest
-
----
-
-## Setup Instructions
-
-### Prerequisites
-- Node.js (v18+)
-- npm or yarn
-- A Supabase account
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/RushiShah1612/BunkCalculator.git
-cd BunkCalculator
-```
-
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Set up Supabase
-1. Create a project at [supabase.com](https://supabase.com).
-2. Open the **SQL Editor** in the Supabase dashboard and run the entire script found in:
-   `supabase_schema.sql`
-
-### 4. Configure environment variables
-Create a `.env.local` file in the root directory:
-```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-### 5. Run locally
-```bash
-npm run dev
-```
+- **🔐 Auth & User Profiles:** Secure signup and login powered by Supabase Auth. Displays initials-based custom colored avatars. Supports inline profile editing and secure password updates.
+- **📚 Nested Subject Management:** Create and edit subjects with credits, semester metadata, and nested class types (e.g. Theory, Lab, Tutorial) with individual hourly weights and attendance targets.
+- **⚡ Advanced Calculations Engine:** Runs real-time calculations for overall percentages, safe bunks available, consecutive sessions needed to restore target attendance, and worst-case projected percentages.
+- **📅 Interactive Attendance Logging:** A comprehensive, grid-based calendar interface allowing quick status logging (`PRESENT`, `ABSENT`, `CANCELLED`, `HOLIDAY`) per class type.
+- **📊 Responsive Analytics & Heatmaps:** Charts built with Recharts (Line, Bar, and Pie) depicting attendance trends over time, subject comparison rates, class type breakdowns, and intensity heatmaps.
+- **📢 Smart Notifications:** Real-time warnings, tips, and alerts that appear in a notification bell popover when a subject falls near or below target levels.
+- **🧪 Demo Data Seeder:** A one-click demo data seeder on the empty dashboard state to instantly populate 4 subjects and 60 days of mock weekday logs (~80% attendance rate) to try out the app.
+- **🔗 Shareable Public Reports:** Generate secure snapshot links (valid for 7 days) of your overall attendance statistics to share publicly without requiring authentication.
+- **📱 PWA & Offline Support:** Desktop and mobile standalone installation support with full asset caching via service workers.
+- **⚠️ Defensive Crash Recovery:** Global error boundaries that catch layout-level rendering exceptions and provide single-click session recovery.
 
 ---
 
-## Deployment (Vercel)
+## 🛠️ Technology Stack
 
-1. Connect your GitHub repository to Vercel.
-2. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as production environment variables in Vercel.
-3. In the Supabase Dashboard → Authentication → URL Configuration:
-   - Set **Site URL** to: `https://your-app.vercel.app`
-   - Add **Redirect URL**: `https://your-app.vercel.app/**`
-4. Deploy the project!
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | React 18, TypeScript, Vite, Tailwind CSS |
+| **Icons** | Lucide React |
+| **Visualizations** | Recharts (Line, Pie, Bar charts) |
+| **Database & Realtime** | Supabase (PostgreSQL, Row Level Security, Triggers) |
+| **State Management** | Zustand |
+| **PWA Engine** | Service Worker API, Web Manifests |
+| **Testing Framework** | Vitest |
 
 ---
 
-## Project Structure
+## 📦 Project Architecture
 
 ```text
 ├── public/                 # Static assets, sw.js, and manifest.json
@@ -103,22 +60,80 @@ npm run dev
 
 ---
 
-## Calculations Logic
+## 📐 Calculations Logic
 
-The calculations engine ([calculations.ts](file:///c:/Users/rushi/Videos/PROJECTS/ATTENDANCE/src/lib/calculations.ts)) handles the core arithmetic for bunk simulations and statistics.
+The core calculations engine ([calculations.ts](file:///c:/Users/rushi/Videos/PROJECTS/ATTENDANCE/src/lib/calculations.ts)) handles the key arithmetic:
 
 ### 1. Attendance Percentage
-$$\text{Current \%} = \left( \frac{\text{Hours Present}}{\text{Hours Held}} \right) \times 100$$
+$$\text{Current Attendance \%} = \left( \frac{\text{Hours Present}}{\text{Hours Held}} \right) \times 100$$
 Where hours are calculated based on session durations (e.g. Theory = 1 hr, Lab = 2 hrs).
 
-### 2. Safe Bunks
-Calculates the maximum number of classes that can be missed without dropping below the target threshold ($T$):
+### 2. Safe Bunks Simulation
+Calculates the maximum number of classes that can be missed consecutively without dropping below the target threshold ($T$, e.g. $0.75$ for 75%):
 $$\text{Safe Bunks} = \lfloor \frac{\text{Hours Present} - (T \times \text{Hours Held})}{\text{Hours Per Session} \times T} \rfloor$$
 
-### 3. Classes Needed
+### 3. Classes Needed to Recover
 Calculates the consecutive number of classes that must be attended to restore attendance back to the target threshold ($T$):
 $$\text{Classes Needed} = \lceil \frac{(T \times \text{Hours Held}) - \text{Hours Present}}{\text{Hours Per Session} \times (1 - T)} \rceil$$
 
 ### 4. Projected Attendance
 Calculates the estimated attendance percentage at the end of the semester, assuming the user misses all remaining planned sessions:
 $$\text{Projected \%} = \left( \frac{\text{Hours Present}}{\text{Total Planned Hours}} \right) \times 100$$
+
+---
+
+## 🚀 Setup & Installation
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- A Supabase account
+
+### 1. Clone & Install
+```bash
+git clone https://github.com/RushiShah1612/BunkCalculator.git
+cd BunkCalculator
+npm install
+```
+
+### 2. Configure Database
+1. Create a project at [supabase.com](https://supabase.com).
+2. Open the **SQL Editor** in the Supabase dashboard and run the entire script found in:
+   [`supabase_schema.sql`](file:///c:/Users/rushi/Videos/PROJECTS/ATTENDANCE/supabase_schema.sql)
+
+### 3. Setup Local Environment
+Create a `.env.local` file in the project root:
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+### 4. Run Locally
+```bash
+npm run dev
+```
+
+---
+
+## 🧪 Testing & Code Quality
+
+Verify that all systems are stable and pass quality checks:
+
+```bash
+# Run unit tests for calculations
+npm run test
+
+# Run typescript type check
+npx tsc --noEmit
+
+# Run code style audits
+npm run lint
+
+# Build the production bundle
+npm run build
+```
+
+---
+
+## 📄 License
+This project is open-source. Feel free to clone, modify, and run your own deployments.
