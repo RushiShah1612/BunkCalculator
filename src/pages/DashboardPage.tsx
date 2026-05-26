@@ -6,6 +6,7 @@ import { Button } from "../components/ui/button"
 import { useAuthStore } from "../store/authStore"
 import { useAttendance } from "../hooks/useAttendance"
 import { useDashboardData } from "../hooks/useDashboardData"
+import { useNotificationAlerts } from "../hooks/useNotificationAlerts"
 import type { AttendanceStatus, Subject } from "../types"
 import {
   BarChart,
@@ -473,6 +474,9 @@ export default function DashboardPage() {
     error,
     refresh,
   } = useDashboardData()
+
+  // Generate automated notifications based on current statistics
+  useNotificationAlerts(subjectStats)
 
   const firstName = profile?.full_name?.split(" ")[0] ?? "there"
   const today = new Date().toLocaleDateString("en-US", {

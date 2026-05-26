@@ -4,10 +4,21 @@ import {
   BookOpen, 
   CalendarCheck, 
   BarChart3,
-  GraduationCap
+  GraduationCap,
+  User,
+  Settings
 } from "lucide-react"
 
-const navItems = [
+const desktopNavItems = [
+  { label: "Dashboard", path: "/", icon: LayoutDashboard },
+  { label: "Subjects", path: "/subjects", icon: BookOpen },
+  { label: "Attendance", path: "/attendance", icon: CalendarCheck },
+  { label: "Analytics", path: "/analytics", icon: BarChart3 },
+  { label: "Profile", path: "/profile", icon: User },
+  { label: "Settings", path: "/settings", icon: Settings },
+]
+
+const mobileNavItems = [
   { label: "Dashboard", path: "/", icon: LayoutDashboard },
   { label: "Subjects", path: "/subjects", icon: BookOpen },
   { label: "Attendance", path: "/attendance", icon: CalendarCheck },
@@ -31,7 +42,7 @@ export function Sidebar() {
 
         {/* Navigation Links */}
         <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
-          {navItems.map((item) => (
+          {desktopNavItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
@@ -60,7 +71,7 @@ export function Sidebar() {
 
       {/* Mobile Bottom Navigation Bar */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 border-t border-border bg-card/85 backdrop-blur-lg z-30 flex justify-around items-center px-2 pb-safe">
-        {navItems.map((item) => (
+        {mobileNavItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}

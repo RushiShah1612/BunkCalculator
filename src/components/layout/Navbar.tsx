@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react"
 import { Sun, Moon, LogOut, User } from "lucide-react"
+import { Link } from "react-router-dom"
 import { useAuth } from "../../hooks/useAuth"
 import { Button } from "../ui/button"
 import { ConfirmDialog } from "../shared/ConfirmDialog"
+import { NotificationBell } from "./NotificationBell"
 
 interface NavbarProps {
   title: string
@@ -50,7 +52,7 @@ export function Navbar({ title }: NavbarProps) {
           {title}
         </h1>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           {/* Theme Toggle */}
           <Button
             variant="ghost"
@@ -62,26 +64,35 @@ export function Navbar({ title }: NavbarProps) {
             {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </Button>
 
+          {/* Notifications */}
+          {user && <NotificationBell />}
+
           {/* User Info & Logout */}
           {user && (
             <div className="flex items-center space-x-3 pl-2 border-l border-border">
-              <div className="hidden md:flex flex-col text-right">
-                <span className="text-sm font-semibold text-foreground">
-                  {profile?.full_name || user.email}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {profile?.semester || "Student"}
-                </span>
-              </div>
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold border border-primary/20">
-                {profile?.full_name ? (
-                  profile.full_name.charAt(0)
-                ) : user.email ? (
-                  user.email.charAt(0).toUpperCase()
-                ) : (
-                  <User className="w-4 h-4" />
-                )}
-              </div>
+              <Link
+                to="/profile"
+                className="flex items-center space-x-3 hover:opacity-80 transition-all duration-200"
+                title="View Profile"
+              >
+                <div className="hidden md:flex flex-col text-right">
+                  <span className="text-sm font-semibold text-foreground">
+                    {profile?.full_name || user.email}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {profile?.semester || "Student"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold border border-primary/20">
+                  {profile?.full_name ? (
+                    profile.full_name.charAt(0)
+                  ) : user.email ? (
+                    user.email.charAt(0).toUpperCase()
+                  ) : (
+                    <User className="w-4 h-4" />
+                  )}
+                </div>
+              </Link>
               <Button
                 variant="ghost"
                 size="icon"

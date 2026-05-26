@@ -1,0 +1,21 @@
+{
+  "name": "RollCall – Attendance Tracker",
+  "short_name": "RollCall",
+  "description": "Track your college attendance, avoid detentions, and simulate bunks.",
+  "theme_color": "#6366f1",
+  "background_color": "#0f0f1a",
+  "display": "standalone",
+  "orientation": "portrait",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "en"
+}
