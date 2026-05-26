@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom"
-import { useEffect, lazy, Suspense } from "react"
+import { useEffect, useState, lazy, Suspense } from "react"
 import { useAuth, useAuthListener } from "./hooks/useAuth"
 import { LoadingSpinner } from "./components/shared/LoadingSpinner"
 import { Sidebar } from "./components/layout/Sidebar"
@@ -41,12 +41,15 @@ function AppLayout() {
   const { subjects, isLoading } = useSubjectStore()
   const { fetchSubjects } = useSubjects()
   const location = useLocation()
+  const [initialLoadDone, setInitialLoadDone] = useState(false)
 
   useEffect(() => {
-    fetchSubjects()
+    fetchSubjects().finally(() => {
+      setInitialLoadDone(true)
+    })
   }, [fetchSubjects])
 
-  if (isLoading) {
+  if (isLoading && !initialLoadDone) {
     return <LoadingSpinner fullPage message="Loading application..." />
   }
 
