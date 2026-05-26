@@ -92,10 +92,12 @@ export function ConfirmDialog({
 
   if (!isOpen) return null
 
-  const isConfirmDisabled = confirmTextMatch ? matchInput !== confirmTextMatch : false
+  const isConfirmDisabled = confirmTextMatch 
+    ? matchInput.trim().toLowerCase() !== confirmTextMatch.trim().toLowerCase() 
+    : false
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
         ref={modalRef}
         role="dialog"
@@ -123,7 +125,7 @@ export function ConfirmDialog({
               value={matchInput}
               onChange={(e) => setMatchInput(e.target.value)}
               placeholder={`Type "${confirmTextMatch}"`}
-              className="w-full px-4 py-2.5 rounded-xl border border-border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-danger/50 focus:border-danger/50 transition-all"
+              className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-red-500/40 focus:border-red-500/40 transition-all"
             />
           </div>
         )}
