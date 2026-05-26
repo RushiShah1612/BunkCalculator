@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS public.class_types (
   total_hours NUMERIC NOT NULL,
   hours_per_session NUMERIC NOT NULL DEFAULT 1,
   min_attendance NUMERIC NOT NULL DEFAULT 75,
+  timetable_days TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

@@ -31,13 +31,13 @@ export async function seedDemoData(userId: string) {
 
   // 2. Insert class types for each subject
   const classTypesData = [
-    { subject_id: math.id, name: "Theory", total_hours: 45, hours_per_session: 1, min_attendance: 75 },
-    { subject_id: math.id, name: "Tutorial", total_hours: 15, hours_per_session: 1, min_attendance: 75 },
-    { subject_id: phys.id, name: "Theory", total_hours: 30, hours_per_session: 1, min_attendance: 75 },
-    { subject_id: phys.id, name: "Lab", total_hours: 30, hours_per_session: 2, min_attendance: 75 },
-    { subject_id: ds.id, name: "Theory", total_hours: 45, hours_per_session: 1, min_attendance: 75 },
-    { subject_id: ds.id, name: "Lab", total_hours: 30, hours_per_session: 2, min_attendance: 75 },
-    { subject_id: eng.id, name: "Theory", total_hours: 30, hours_per_session: 1, min_attendance: 75 },
+    { subject_id: math.id, name: "Theory", total_hours: 45, hours_per_session: 1, min_attendance: 75, timetable_days: ["Monday", "Wednesday"] },
+    { subject_id: math.id, name: "Tutorial", total_hours: 15, hours_per_session: 1, min_attendance: 75, timetable_days: ["Tuesday"] },
+    { subject_id: phys.id, name: "Theory", total_hours: 30, hours_per_session: 1, min_attendance: 75, timetable_days: ["Monday", "Thursday"] },
+    { subject_id: phys.id, name: "Lab", total_hours: 30, hours_per_session: 2, min_attendance: 75, timetable_days: ["Friday"] },
+    { subject_id: ds.id, name: "Theory", total_hours: 45, hours_per_session: 1, min_attendance: 75, timetable_days: ["Wednesday", "Friday"] },
+    { subject_id: ds.id, name: "Lab", total_hours: 30, hours_per_session: 2, min_attendance: 75, timetable_days: ["Tuesday"] },
+    { subject_id: eng.id, name: "Theory", total_hours: 30, hours_per_session: 1, min_attendance: 75, timetable_days: ["Tuesday", "Thursday"] },
   ]
 
   const { data: insertedClassTypes, error: ctError } = await supabase
@@ -50,6 +50,7 @@ export async function seedDemoData(userId: string) {
 
   // 3. Generate 60 days of attendance records
   // Random weekday records: ~80% PRESENT, ~15% ABSENT, ~5% CANCELLED
+  const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
   const records = []
   const now = new Date()
 
@@ -62,10 +63,12 @@ export async function seedDemoData(userId: string) {
     if (dayOfWeek === 0 || dayOfWeek === 6) continue
 
     const dateStr = d.toISOString().slice(0, 10)
+    const currentDayName = daysOfWeek[dayOfWeek]
 
     for (const ct of insertedClassTypes) {
-      // 40% chance that a session occurs for this specific class type on any given weekday
-      if (Math.random() < 0.4) {
+      const scheduledDays = (ct.timetable_days as string[]) || []
+      // Verify if this class type is scheduled for the day of the week
+      if (scheduledDays.includes(currentDayName)) {
         const rand = Math.random()
         const status = rand < 0.82 ? "PRESENT" : rand < 0.96 ? "ABSENT" : "CANCELLED"
         records.push({

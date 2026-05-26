@@ -79,6 +79,7 @@ export function useSubjects() {
         total_hours: ct.total_hours,
         hours_per_session: ct.hours_per_session,
         min_attendance: ct.min_attendance,
+        timetable_days: ct.timetable_days || [],
       }))
 
       const { data: classTypeRows, error: classTypeError } = await supabase
@@ -164,6 +165,7 @@ export function useSubjects() {
               total_hours: ct.total_hours,
               hours_per_session: ct.hours_per_session,
               min_attendance: ct.min_attendance,
+              timetable_days: ct.timetable_days || [],
             })
             .eq("id", ct.id)
           if (updateError) throw updateError
@@ -177,6 +179,7 @@ export function useSubjects() {
               total_hours: ct.total_hours,
               hours_per_session: ct.hours_per_session,
               min_attendance: ct.min_attendance,
+              timetable_days: ct.timetable_days || [],
             })
           if (insertError) throw insertError
         }

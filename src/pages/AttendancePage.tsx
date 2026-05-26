@@ -653,6 +653,20 @@ export default function AttendancePage() {
   const [entries, setEntries] = useState<Record<string, { status: AttendanceStatus | null; notes: string }>>({})
   const [saving, setSaving] = useState(false)
   const [fabOpen, setFabOpen] = useState(false)
+  const [filterByTimetable, setFilterByTimetable] = useState(() => {
+    return localStorage.getItem("filter-by-timetable") !== "false"
+  })
+
+  useEffect(() => {
+    localStorage.setItem("filter-by-timetable", String(filterByTimetable))
+  }, [filterByTimetable])
+
+  const getDayName = useCallback((dateStr: string) => {
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    const [y, m, d] = dateStr.split("-").map(Number)
+    const dateObj = new Date(y, m - 1, d)
+    return daysOfWeek[dateObj.getDay()]
+  }, [])
 
   useEffect(() => {
     document.title = "Log Attendance | RollCall"
@@ -664,6 +678,22 @@ export default function AttendancePage() {
     fetchMonthSummary,
     upsertAttendance,
   } = useAttendance()
+
+  const visibleSubjects = useMemo(() => {
+    if (!filterByTimetable) return subjects
+    const selectedDayName = getDayName(selectedDate)
+    return subjects
+      .map((sub) => {
+        const filteredClassTypes = sub.class_types.filter(
+          (ct) =>
+            !ct.timetable_days ||
+            ct.timetable_days.length === 0 ||
+            ct.timetable_days.includes(selectedDayName)
+        )
+        return { ...sub, class_types: filteredClassTypes }
+      })
+      .filter((sub) => sub.class_types.length > 0)
+  }, [subjects, selectedDate, filterByTimetable, getDayName])
 
   // Load subjects on mount
   useEffect(() => {
@@ -768,7 +798,7 @@ export default function AttendancePage() {
     }
   }
 
-  const allCtCount = subjects.reduce((a, s) => a + s.class_types.length, 0)
+  const allCtCount = visibleSubjects.reduce((a, s) => a + s.class_types.length, 0)
   const markedCount = Object.values(entries).filter((e) => e.status).length
 
   return (
@@ -863,6 +893,27 @@ export default function AttendancePage() {
                 </div>
               </div>
 
+              {/* Timetable Filter Toggle */}
+              {subjects.length > 0 && (
+                <div className="flex items-center justify-between mb-4 bg-muted/20 border border-border/40 rounded-2xl px-4 py-2.5 backdrop-blur-sm">
+                  <span className="text-xs text-muted-foreground">
+                    Scheduled for <strong>{getDayName(selectedDate)}</strong>
+                  </span>
+                  <label className="flex items-center space-x-2.5 cursor-pointer select-none">
+                    <span className="text-xs font-semibold text-foreground">Filter by Timetable</span>
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        checked={filterByTimetable}
+                        onChange={(e) => setFilterByTimetable(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-9 h-5 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+                    </div>
+                  </label>
+                </div>
+              )}
+
               {/* Subjects form */}
               {subjects.length === 0 ? (
                 <div className="bg-card border border-border rounded-3xl flex flex-col items-center justify-center py-20 text-center">
@@ -872,9 +923,28 @@ export default function AttendancePage() {
                     Add subjects from the Subjects page to start logging attendance.
                   </p>
                 </div>
+              ) : visibleSubjects.length === 0 ? (
+                <div className="bg-card border border-border rounded-3xl flex flex-col items-center justify-center py-16 px-6 text-center space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <CalendarDays className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-foreground mb-1">No Classes Scheduled</p>
+                    <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
+                      There are no classes scheduled for <strong>{getDayName(selectedDate)}</strong> according to your timetable.
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => setFilterByTimetable(false)}
+                    variant="outline"
+                    className="rounded-xl text-xs h-9 px-4"
+                  >
+                    Show All Classes
+                  </Button>
+                </div>
               ) : (
                 <div className="space-y-3">
-                  {subjects.map((sub) => (
+                  {visibleSubjects.map((sub) => (
                     <SubjectBlock
                       key={sub.id}
                       subject={sub}

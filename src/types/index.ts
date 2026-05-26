@@ -13,6 +13,7 @@ export interface ClassTypeConfig {
   total_hours: number
   hours_per_session: number
   min_attendance: number      // default 75
+  timetable_days?: string[]
   created_at: string
 }
 

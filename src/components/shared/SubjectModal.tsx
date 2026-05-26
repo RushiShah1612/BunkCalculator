@@ -36,6 +36,7 @@ const classTypeFormSchema = z
     total_hours: z.coerce.number().min(1, "Must be > 0"),
     hours_per_session: z.coerce.number().min(0.5, "Must be >= 0.5"),
     min_attendance: z.coerce.number().min(1, "Must be >= 1").max(100, "Max 100"),
+    timetable_days: z.array(z.string()).default([]),
   })
   .refine((data) => data.hours_per_session <= data.total_hours, {
     message: "Session hours exceed total",
@@ -120,6 +121,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
               total_hours: Number(ct.total_hours),
               hours_per_session: Number(ct.hours_per_session),
               min_attendance: Number(ct.min_attendance),
+              timetable_days: ct.timetable_days || [],
             }
           }),
         })
@@ -137,6 +139,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
               total_hours: 45,
               hours_per_session: 1,
               min_attendance: 75,
+              timetable_days: [],
             },
           ],
         })
@@ -152,6 +155,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
       total_hours: ct.total_hours,
       hours_per_session: ct.hours_per_session,
       min_attendance: ct.min_attendance,
+      timetable_days: ct.timetable_days || [],
     }))
 
     const payload = {
@@ -307,6 +311,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                     total_hours: 30,
                     hours_per_session: 1,
                     min_attendance: 75,
+                    timetable_days: [],
                   })
                 }
                 className="rounded-xl flex items-center space-x-1"
@@ -417,6 +422,38 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                         />
                       </div>
                     )}
+
+                    {/* Timetable Days Selector */}
+                    <div className="space-y-1.5 pl-1">
+                      <span className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+                        Timetable Days (Scheduled Days)
+                      </span>
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => {
+                          const currentDays = watch(`class_types.${index}.timetable_days`) || []
+                          const isSelected = currentDays.includes(day)
+                          return (
+                            <button
+                              key={day}
+                              type="button"
+                              onClick={() => {
+                                const updatedDays = isSelected
+                                  ? currentDays.filter((d: string) => d !== day)
+                                  : [...currentDays, day]
+                                setValue(`class_types.${index}.timetable_days`, updatedDays, { shouldValidate: true })
+                              }}
+                              className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all ${
+                                isSelected
+                                  ? "bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20"
+                                  : "bg-muted/40 border border-border/50 text-muted-foreground hover:bg-muted hover:text-foreground"
+                              }`}
+                            >
+                              {day.slice(0, 3)}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
 
                     {/* Extra Session expectation calculation info */}
                     <div className="flex justify-between items-center text-[10px] font-medium text-muted-foreground pl-1">

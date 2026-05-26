@@ -384,11 +384,25 @@ function TodayQuickLog({ subjects, todayRecords, onRefresh }: TodayQuickLogProps
     return map
   }, [todayRecords])
 
-  const allClassTypes = subjects.flatMap((s) =>
-    s.class_types.map((ct) => ({ subject: s, ct }))
-  )
+  const todayDayName = useMemo(() => {
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    return daysOfWeek[new Date().getDay()]
+  }, [])
 
-  const allMarked = allClassTypes.every((x) => recordMap[x.ct.id])
+  const allClassTypes = useMemo(() => {
+    const list = []
+    for (const s of subjects) {
+      for (const ct of s.class_types) {
+        if (ct.timetable_days && ct.timetable_days.length > 0 && !ct.timetable_days.includes(todayDayName)) {
+          continue
+        }
+        list.push({ subject: s, ct })
+      }
+    }
+    return list
+  }, [subjects, todayDayName])
+
+  const allMarked = allClassTypes.length > 0 && allClassTypes.every((x) => recordMap[x.ct.id])
 
   const markStatus = async (ctId: string, status: AttendanceStatus) => {
     setSaving(ctId)
