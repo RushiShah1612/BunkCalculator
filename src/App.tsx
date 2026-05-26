@@ -17,7 +17,8 @@ import NotFoundPage from "./pages/NotFoundPage"
 function ProtectedRoute() {
   const { user, loading } = useAuth()
 
-  if (loading) {
+  // Only block on loading if we don't yet know if user is authenticated
+  if (loading && !user) {
     return <LoadingSpinner fullPage message="Verifying session..." />
   }
 
@@ -39,12 +40,13 @@ function ProtectedRoute() {
 function PublicRoute() {
   const { user, loading } = useAuth()
 
-  if (loading) {
-    return <LoadingSpinner fullPage message="Loading..." />
-  }
-
+  // If user is already known, redirect immediately
   if (user) {
     return <Navigate to="/" replace />
+  }
+
+  if (loading) {
+    return <LoadingSpinner fullPage message="Loading..." />
   }
 
   return <Outlet />

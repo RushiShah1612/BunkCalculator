@@ -102,17 +102,20 @@ export function useAuthListener() {
     initSession()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      (_event, session) => {
         if (!isMounted) return
         
         if (session?.user) {
           setUser(session.user)
-          await fetchProfile(session.user.id)
+          // fetch profile async but always clear loading
+          fetchProfile(session.user.id).finally(() => {
+            if (isMounted) setLoading(false)
+          })
         } else {
           setUser(null)
           setProfile(null)
+          setLoading(false)
         }
-        setLoading(false)
       }
     )
 
