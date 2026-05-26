@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS public.subjects (
   color_tag TEXT NOT NULL DEFAULT '#6366f1',
   credits INTEGER,
   semester TEXT,
+  min_attendance NUMERIC NOT NULL DEFAULT 75,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -84,7 +85,6 @@ CREATE TABLE IF NOT EXISTS public.class_types (
   name TEXT NOT NULL,
   total_hours NUMERIC NOT NULL,
   hours_per_session NUMERIC NOT NULL DEFAULT 1,
-  min_attendance NUMERIC NOT NULL DEFAULT 75,
   timetable_days TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

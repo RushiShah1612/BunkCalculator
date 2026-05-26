@@ -21,7 +21,6 @@ function makeClassType(overrides: Partial<ClassTypeConfig> = {}): ClassTypeConfi
     name: "Theory",
     total_hours: 60,
     hours_per_session: 1,
-    min_attendance: 75,
     created_at: "2024-01-01T00:00:00Z",
     ...overrides,
   }

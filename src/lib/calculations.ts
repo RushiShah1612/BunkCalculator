@@ -295,7 +295,8 @@ export function calculateOverallStats(statsArray: AttendanceStats[]): {
  */
 export function calculateClassTypeStats(
   classType: ClassTypeConfig,
-  records: AttendanceRecord[]
+  records: AttendanceRecord[],
+  minAttendance: number = 75
 ): AttendanceStats {
   const typeRecords = records.filter(
     (r) => r.class_type_id === classType.id
@@ -323,19 +324,19 @@ export function calculateClassTypeStats(
     hoursPresent,
     hoursHeld,
     classType.total_hours,
-    classType.min_attendance,
+    minAttendance,
     classType.hours_per_session
   )
   const classesNeeded = calculateClassesNeeded(
     hoursPresent,
     hoursHeld,
     classType.total_hours,
-    classType.min_attendance,
+    minAttendance,
     classType.hours_per_session
   )
   const status = calculateAttendanceStatus(
     currentPercentage,
-    classType.min_attendance
+    minAttendance
   )
 
   return {
@@ -343,7 +344,7 @@ export function calculateClassTypeStats(
     classTypeName: classType.name,
     totalHours: classType.total_hours,
     hoursPerSession: classType.hours_per_session,
-    minAttendance: classType.min_attendance,
+    minAttendance,
     hoursHeld,
     hoursPresent,
     currentPercentage,
@@ -446,7 +447,7 @@ export interface SubjectStatsSummary {
  * Returns the worst-case status from any of the class types.
  */
 export function calculateSubjectStats(
-  subject: { class_types: ClassTypeConfig[] },
+  subject: { min_attendance?: number; class_types: ClassTypeConfig[] },
   records: AttendanceRecord[]
 ): SubjectStatsSummary {
   let totalHeld = 0
@@ -454,8 +455,10 @@ export function calculateSubjectStats(
   let hasDanger = false
   let hasWarning = false
 
+  const minAttendance = subject.min_attendance ?? 75
+
   for (const config of subject.class_types) {
-    const stats = calculateClassTypeStats(config, records)
+    const stats = calculateClassTypeStats(config, records, minAttendance)
     totalHeld += stats.hoursHeld
     totalPresent += stats.hoursPresent
     if (stats.status === "danger") hasDanger = true

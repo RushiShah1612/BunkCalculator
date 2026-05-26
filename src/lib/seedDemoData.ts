@@ -9,10 +9,10 @@ import { supabase } from "./supabase"
 export async function seedDemoData(userId: string) {
   // 1. Insert 4 subjects
   const subjectsData = [
-    { name: "Mathematics", code: "MA101", color_tag: "#6366f1", credits: 4, semester: "Semester 1", user_id: userId },
-    { name: "Physics", code: "PH101", color_tag: "#ec4899", credits: 3, semester: "Semester 1", user_id: userId },
-    { name: "Data Structures", code: "CS101", color_tag: "#10b981", credits: 4, semester: "Semester 1", user_id: userId },
-    { name: "English", code: "EN101", color_tag: "#f59e0b", credits: 2, semester: "Semester 1", user_id: userId },
+    { name: "Mathematics", code: "MA101", color_tag: "#6366f1", credits: 4, semester: "Semester 1", min_attendance: 75, user_id: userId },
+    { name: "Physics", code: "PH101", color_tag: "#ec4899", credits: 3, semester: "Semester 1", min_attendance: 75, user_id: userId },
+    { name: "Data Structures", code: "CS101", color_tag: "#10b981", credits: 4, semester: "Semester 1", min_attendance: 75, user_id: userId },
+    { name: "English", code: "EN101", color_tag: "#f59e0b", credits: 2, semester: "Semester 1", min_attendance: 75, user_id: userId },
   ]
 
   const { data: insertedSubjects, error: subjectsError } = await supabase
@@ -31,13 +31,13 @@ export async function seedDemoData(userId: string) {
 
   // 2. Insert class types for each subject
   const classTypesData = [
-    { subject_id: math.id, name: "Theory", total_hours: 45, hours_per_session: 1, min_attendance: 75, timetable_days: ["Monday", "Wednesday"] },
-    { subject_id: math.id, name: "Tutorial", total_hours: 15, hours_per_session: 1, min_attendance: 75, timetable_days: ["Tuesday"] },
-    { subject_id: phys.id, name: "Theory", total_hours: 30, hours_per_session: 1, min_attendance: 75, timetable_days: ["Monday", "Thursday"] },
-    { subject_id: phys.id, name: "Lab", total_hours: 30, hours_per_session: 2, min_attendance: 75, timetable_days: ["Friday"] },
-    { subject_id: ds.id, name: "Theory", total_hours: 45, hours_per_session: 1, min_attendance: 75, timetable_days: ["Wednesday", "Friday"] },
-    { subject_id: ds.id, name: "Lab", total_hours: 30, hours_per_session: 2, min_attendance: 75, timetable_days: ["Tuesday"] },
-    { subject_id: eng.id, name: "Theory", total_hours: 30, hours_per_session: 1, min_attendance: 75, timetable_days: ["Tuesday", "Thursday"] },
+    { subject_id: math.id, name: "Theory", total_hours: 45, hours_per_session: 1, timetable_days: ["Monday", "Wednesday"] },
+    { subject_id: math.id, name: "Tutorial", total_hours: 15, hours_per_session: 1, timetable_days: ["Tuesday"] },
+    { subject_id: phys.id, name: "Theory", total_hours: 30, hours_per_session: 1, timetable_days: ["Monday", "Thursday"] },
+    { subject_id: phys.id, name: "Lab", total_hours: 30, hours_per_session: 2, timetable_days: ["Friday"] },
+    { subject_id: ds.id, name: "Theory", total_hours: 45, hours_per_session: 1, timetable_days: ["Wednesday", "Friday"] },
+    { subject_id: ds.id, name: "Lab", total_hours: 30, hours_per_session: 2, timetable_days: ["Tuesday"] },
+    { subject_id: eng.id, name: "Theory", total_hours: 30, hours_per_session: 1, timetable_days: ["Tuesday", "Thursday"] },
   ]
 
   const { data: insertedClassTypes, error: ctError } = await supabase

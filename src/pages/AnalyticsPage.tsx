@@ -473,9 +473,7 @@ function GaugeGrid({ allStats, subjects }: {
     const totalHeld = subStats.reduce((a, s) => a + s.hoursHeld, 0)
     const totalPresent = subStats.reduce((a, s) => a + s.hoursPresent, 0)
     const pct = totalHeld > 0 ? (totalPresent / totalHeld) * 100 : 0
-    const minPct = sub.class_types.length > 0
-      ? Math.min(...sub.class_types.map((ct: import("../types").ClassTypeConfig) => ct.min_attendance))
-      : 75
+    const minPct = sub.min_attendance ?? 75
     return { sub, pct, minPct }
   })
 
@@ -918,7 +916,7 @@ export default function AnalyticsPage() {
     try {
       // Calculate statistics for each subject in subjects list
       const overallSubjects = subjects.map(s => {
-        const ctStats = s.class_types.map(ct => calculateClassTypeStats(ct, allRecords))
+        const ctStats = s.class_types.map(ct => calculateClassTypeStats(ct, allRecords, s.min_attendance))
         const agg = calculateOverallStats(ctStats)
         return {
           name: s.name,
@@ -936,7 +934,7 @@ export default function AnalyticsPage() {
 
       // Aggregate overall attendance percentage
       const allClassTypeStats = subjects.flatMap(s => 
-        s.class_types.map(ct => calculateClassTypeStats(ct, allRecords))
+        s.class_types.map(ct => calculateClassTypeStats(ct, allRecords, s.min_attendance))
       )
       const globalOverall = calculateOverallStats(allClassTypeStats).overallPercentage
 

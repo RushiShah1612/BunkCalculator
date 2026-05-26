@@ -114,7 +114,7 @@ export function useDashboardData(): DashboardData {
     const stats: AttendanceStats[] = []
     for (const subject of subjects) {
       for (const ct of subject.class_types) {
-        stats.push(calculateClassTypeStats(ct, monthRecords))
+        stats.push(calculateClassTypeStats(ct, monthRecords, subject.min_attendance))
       }
     }
     return stats
@@ -124,7 +124,7 @@ export function useDashboardData(): DashboardData {
   const subjectStats = useMemo<SubjectWithStats[]>(() => {
     return subjects.map((subject) => {
       const ctStats = subject.class_types.map((ct) =>
-        calculateClassTypeStats(ct, monthRecords)
+        calculateClassTypeStats(ct, monthRecords, subject.min_attendance)
       )
       const agg = calculateOverallStats(ctStats)
       const worstStatus: "safe" | "warning" | "danger" =

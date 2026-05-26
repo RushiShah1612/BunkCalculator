@@ -141,11 +141,9 @@ export default function SubjectsPage() {
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block truncate max-w-[120px]">
                       {sub.code || "No Code"}
                     </span>
-                    {sub.credits && (
-                      <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-bold">
-                        {sub.credits} Credits
-                      </span>
-                    )}
+                    <span className="text-[10px] bg-muted text-muted-foreground px-2 py-0.5 rounded-full font-bold">
+                      {sub.credits ? `${sub.credits} Credits · ` : ""}{sub.min_attendance ?? 75}% Req
+                    </span>
                   </div>
                   <h3 className="text-sm md:text-lg font-bold text-foreground mb-1 leading-snug line-clamp-1">
                     {sub.name}
@@ -168,7 +166,7 @@ export default function SubjectsPage() {
                         <div key={type.id} className="flex justify-between items-center text-[10px] md:text-xs">
                           <span className="font-semibold text-foreground/80">{type.name}</span>
                           <span className="text-muted-foreground">
-                            {type.total_hours} hrs · {sessions} sessions ({type.min_attendance}%)
+                            {type.total_hours} hrs · {sessions} sessions
                           </span>
                         </div>
                       )

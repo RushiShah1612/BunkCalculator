@@ -22,7 +22,7 @@ export function useNotificationAlerts(subjectStats: SubjectWithStats[]) {
 
     subjectStats.forEach((stat) => {
       const { subject, overallPct, overallStatus, totalSafeBunks } = stat
-      const minAttendance = subject.class_types[0]?.min_attendance ?? 75
+      const minAttendance = subject.min_attendance ?? 75
 
       // 1. Danger Alert
       if (overallStatus === "danger" || overallPct < minAttendance) {

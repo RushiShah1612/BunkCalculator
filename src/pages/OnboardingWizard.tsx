@@ -117,7 +117,6 @@ function StepAddSubject({
           name: "Theory",
           total_hours: Number(form.theoryHours),
           hours_per_session: 1,
-          min_attendance: Number(form.minAttendance),
         })
       }
       if (Number(form.labHours) > 0) {
@@ -125,7 +124,6 @@ function StepAddSubject({
           name: "Lab",
           total_hours: Number(form.labHours),
           hours_per_session: 2,
-          min_attendance: Number(form.minAttendance),
         })
       }
 
@@ -135,6 +133,7 @@ function StepAddSubject({
         color_tag: "#6366f1",
         credits: null,
         semester: null,
+        min_attendance: Number(form.minAttendance),
         class_types: classTypes,
       })
 

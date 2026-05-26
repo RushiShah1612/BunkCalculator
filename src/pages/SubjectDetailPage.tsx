@@ -303,6 +303,10 @@ function StatsCard({ stats, color, onMinChange }: StatsCardProps) {
   const [localMin, setLocalMin] = useState(stats.minAttendance)
   const [saving, setSaving] = useState(false)
 
+  useEffect(() => {
+    setLocalMin(stats.minAttendance)
+  }, [stats.minAttendance])
+
   const handleMinSave = async (val: number) => {
     setSaving(true)
     await onMinChange(stats.classTypeId, val)

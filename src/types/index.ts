@@ -12,7 +12,6 @@ export interface ClassTypeConfig {
   name: ClassTypeName
   total_hours: number
   hours_per_session: number
-  min_attendance: number      // default 75
   timetable_days?: string[]
   created_at: string
 }
@@ -25,6 +24,7 @@ export interface Subject {
   color_tag: string
   credits: number | null
   semester: string | null
+  min_attendance: number      // default 75
   class_types: ClassTypeConfig[]
   created_at: string
 }

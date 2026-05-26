@@ -35,7 +35,6 @@ const classTypeFormSchema = z
     customName: z.string().optional(),
     total_hours: z.coerce.number().min(1, "Must be > 0"),
     hours_per_session: z.coerce.number().min(0.5, "Must be >= 0.5"),
-    min_attendance: z.coerce.number().min(1, "Must be >= 1").max(100, "Max 100"),
     timetable_days: z.array(z.string()).default([]),
   })
   .refine((data) => data.hours_per_session <= data.total_hours, {
@@ -49,6 +48,7 @@ const subjectFormSchema = z.object({
   credits: z.coerce.number().optional(),
   semester: z.string().optional(),
   color_tag: z.string().min(1, "Color tag is required"),
+  min_attendance: z.coerce.number().min(1, "Must be >= 1").max(100, "Max 100"),
   class_types: z.array(classTypeFormSchema).min(1, "At least one class type is required"),
 })
 
@@ -81,13 +81,13 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
       credits: undefined,
       semester: "",
       color_tag: PRESET_COLORS[0].hex,
+      min_attendance: 75,
       class_types: [
         {
           name: "Theory",
           customName: "",
           total_hours: 45,
           hours_per_session: 1,
-          min_attendance: 75,
         },
       ],
     },
@@ -112,6 +112,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
           credits: subject.credits || undefined,
           semester: subject.semester || "",
           color_tag: subject.color_tag,
+          min_attendance: subject.min_attendance ?? 75,
           class_types: subject.class_types.map((ct) => {
             const isStandard = ["Theory", "Lab", "Tutorial", "Seminar", "Project"].includes(ct.name)
             return {
@@ -120,7 +121,6 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
               customName: isStandard ? "" : ct.name,
               total_hours: Number(ct.total_hours),
               hours_per_session: Number(ct.hours_per_session),
-              min_attendance: Number(ct.min_attendance),
               timetable_days: ct.timetable_days || [],
             }
           }),
@@ -132,13 +132,13 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
           credits: undefined,
           semester: "",
           color_tag: PRESET_COLORS[0].hex,
+          min_attendance: 75,
           class_types: [
             {
               name: "Theory",
               customName: "",
               total_hours: 45,
               hours_per_session: 1,
-              min_attendance: 75,
               timetable_days: [],
             },
           ],
@@ -154,7 +154,6 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
       name: ct.name === "Custom" ? ct.customName || "Custom" : ct.name,
       total_hours: ct.total_hours,
       hours_per_session: ct.hours_per_session,
-      min_attendance: ct.min_attendance,
       timetable_days: ct.timetable_days || [],
     }))
 
@@ -163,6 +162,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
       credits: data.credits || null,
       code: data.code || null,
       semester: data.semester || null,
+      min_attendance: data.min_attendance,
       class_types: formattedClassTypes,
     }
 
@@ -206,7 +206,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="md:col-span-2">
                 <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 pl-1">
                   Subject Name*
                 </label>
@@ -260,6 +260,25 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                   className="w-full px-4 py-2.5 rounded-xl border border-border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                 />
               </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 pl-1">
+                  Minimum Required Attendance (%) *
+                </label>
+                <input
+                  type="number"
+                  placeholder="75"
+                  {...registerField("min_attendance")}
+                  className={`w-full px-4 py-2.5 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+                    errors.min_attendance ? "border-danger focus:ring-danger/50" : "border-border"
+                  }`}
+                />
+                {errors.min_attendance && (
+                  <span className="text-xs text-danger mt-1 block pl-1">
+                    {errors.min_attendance.message}
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Color Swatch Picker */}
@@ -310,7 +329,6 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                     customName: "",
                     total_hours: 30,
                     hours_per_session: 1,
-                    min_attendance: 75,
                     timetable_days: [],
                   })
                 }
@@ -340,7 +358,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                     key={field.id}
                     className="p-4 rounded-2xl border border-border/80 bg-background/30 space-y-4 relative"
                   >
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 items-end">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 items-end">
                       {/* Name Selector */}
                       <div className="col-span-2 sm:col-span-1">
                         <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 pl-1">
@@ -386,21 +404,6 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                           {...registerField(`class_types.${index}.hours_per_session`)}
                           className={`w-full px-3 py-1.5 rounded-xl border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 ${
                             rowErrors?.hours_per_session ? "border-danger focus:ring-danger/50" : "border-border"
-                          }`}
-                        />
-                      </div>
-
-                      {/* Minimum Attendance */}
-                      <div>
-                        <label className="block text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1 pl-1">
-                          Min Att. %
-                        </label>
-                        <input
-                          type="number"
-                          placeholder="75"
-                          {...registerField(`class_types.${index}.min_attendance`)}
-                          className={`w-full px-3 py-1.5 rounded-xl border bg-card text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 ${
-                            rowErrors?.min_attendance ? "border-danger focus:ring-danger/50" : "border-border"
                           }`}
                         />
                       </div>
@@ -473,13 +476,12 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                     </div>
 
                     {/* Render error summaries for the row */}
-                    {(rowErrors?.total_hours || rowErrors?.hours_per_session || rowErrors?.min_attendance) && (
+                    {(rowErrors?.total_hours || rowErrors?.hours_per_session) && (
                       <div className="p-2 rounded-xl bg-danger/5 text-[10px] text-danger flex items-start space-x-1 pl-2">
                         <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
                         <div>
                           {rowErrors?.total_hours?.message && <p>· Total hours: {rowErrors?.total_hours?.message}</p>}
                           {rowErrors?.hours_per_session?.message && <p>· Hrs/Session: {rowErrors?.hours_per_session?.message}</p>}
-                          {rowErrors?.min_attendance?.message && <p>· Min attendance: {rowErrors?.min_attendance?.message}</p>}
                         </div>
                       </div>
                     )}

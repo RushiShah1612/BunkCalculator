@@ -89,26 +89,24 @@ export function useSubjectDetail(subjectId: string): SubjectDetailData {
   // Compute stats per class type
   const statsPerType = useMemo<AttendanceStats[]>(() => {
     if (!subject) return []
-    return subject.class_types.map((ct) => calculateClassTypeStats(ct, records))
+    return subject.class_types.map((ct) => calculateClassTypeStats(ct, records, subject.min_attendance))
   }, [subject, records])
 
-  // Quick-update min_attendance for a single class type
+  // Quick-update min_attendance for the subject
   const updateMinAttendance = useCallback(
     async (classTypeId: string, value: number) => {
+      void classTypeId
       if (!subject) return
       try {
         const { error: err } = await supabase
-          .from("class_types")
+          .from("subjects")
           .update({ min_attendance: value })
-          .eq("id", classTypeId)
+          .eq("id", subject.id)
 
         if (err) throw err
 
         // Update subject in store
-        const updatedClassTypes = subject.class_types.map((ct) =>
-          ct.id === classTypeId ? { ...ct, min_attendance: value } : ct
-        )
-        updateSubjectInStore({ ...subject, class_types: updatedClassTypes })
+        updateSubjectInStore({ ...subject, min_attendance: value })
         toast("Required % updated!", "success")
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Update failed"

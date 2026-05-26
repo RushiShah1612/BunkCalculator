@@ -66,6 +66,7 @@ export function useSubjects() {
           color_tag: subjectData.color_tag,
           credits: subjectData.credits || null,
           semester: subjectData.semester || null,
+          min_attendance: subjectData.min_attendance,
         })
         .select()
         .single()
@@ -78,7 +79,6 @@ export function useSubjects() {
         name: ct.name,
         total_hours: ct.total_hours,
         hours_per_session: ct.hours_per_session,
-        min_attendance: ct.min_attendance,
         timetable_days: ct.timetable_days || [],
       }))
 
@@ -127,6 +127,7 @@ export function useSubjects() {
           color_tag: subjectData.color_tag,
           credits: subjectData.credits || null,
           semester: subjectData.semester || null,
+          min_attendance: subjectData.min_attendance,
         })
         .eq("id", id)
 
@@ -164,7 +165,6 @@ export function useSubjects() {
               name: ct.name,
               total_hours: ct.total_hours,
               hours_per_session: ct.hours_per_session,
-              min_attendance: ct.min_attendance,
               timetable_days: ct.timetable_days || [],
             })
             .eq("id", ct.id)
@@ -178,7 +178,6 @@ export function useSubjects() {
               name: ct.name,
               total_hours: ct.total_hours,
               hours_per_session: ct.hours_per_session,
-              min_attendance: ct.min_attendance,
               timetable_days: ct.timetable_days || [],
             })
           if (insertError) throw insertError

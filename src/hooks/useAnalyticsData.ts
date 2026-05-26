@@ -121,7 +121,7 @@ export function useAnalyticsData(): AnalyticsData {
 
     for (const sub of filteredSubjects) {
       for (const ct of sub.class_types) {
-        result.push(calculateClassTypeStats(ct, filteredRecords))
+        result.push(calculateClassTypeStats(ct, filteredRecords, sub.min_attendance))
       }
     }
     return result
