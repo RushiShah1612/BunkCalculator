@@ -78,7 +78,10 @@ export function useSubjectDetail(subjectId: string): SubjectDetailData {
   }, [user, subjectId, subject, updateSubjectInStore])
 
   useEffect(() => {
-    fetchRecords()
+    const timer = setTimeout(() => {
+      fetchRecords()
+    }, 0)
+    return () => clearTimeout(timer)
   }, [fetchRecords, refreshToken])
 
   const refresh = useCallback(() => setRefreshToken((t) => t + 1), [])

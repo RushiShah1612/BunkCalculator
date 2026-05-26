@@ -1,3 +1,4 @@
+import { useCallback } from "react"
 import { useSubjectStore } from "../store/subjectStore"
 import { useAuthStore } from "../store/authStore"
 import { useToastStore } from "../store/toastStore"
@@ -20,7 +21,7 @@ export function useSubjects() {
   const { user } = useAuthStore()
   const { toast } = useToastStore()
 
-  const fetchSubjects = async () => {
+  const fetchSubjects = useCallback(async () => {
     if (!user) return
     setLoading(true)
     setError(null)
@@ -36,16 +37,17 @@ export function useSubjects() {
 
       if (selectError) throw selectError
       setSubjects(data as Subject[])
-    } catch (err: any) {
-      console.error("Error fetching subjects:", err.message)
-      setError(err.message)
-      toast("Failed to load subjects: " + err.message, "error")
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err)
+      console.error("Error fetching subjects:", errorMsg)
+      setError(errorMsg)
+      toast("Failed to load subjects: " + errorMsg, "error")
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, setLoading, setError, setSubjects, toast])
 
-  const createSubject = async (
+  const createSubject = useCallback(async (
     subjectData: Omit<Subject, "id" | "user_id" | "created_at" | "class_types"> & {
       class_types: Omit<ClassTypeConfig, "id" | "subject_id" | "created_at">[]
     }
@@ -94,17 +96,18 @@ export function useSubjects() {
       addSubject(completeSubject)
       toast("Subject created successfully!", "success")
       return completeSubject
-    } catch (err: any) {
-      console.error("Error creating subject:", err.message)
-      setError(err.message)
-      toast("Failed to create subject: " + err.message, "error")
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err)
+      console.error("Error creating subject:", errorMsg)
+      setError(errorMsg)
+      toast("Failed to create subject: " + errorMsg, "error")
       throw err
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, setLoading, setError, addSubject, toast])
 
-  const updateSubject = async (
+  const updateSubject = useCallback(async (
     id: string,
     subjectData: Omit<Subject, "id" | "user_id" | "created_at" | "class_types"> & {
       class_types: (Omit<ClassTypeConfig, "id" | "subject_id" | "created_at"> & { id?: string })[]
@@ -194,17 +197,18 @@ export function useSubjects() {
       updateSubjectInStore(updatedSubject as Subject)
       toast("Subject updated successfully!", "success")
       return updatedSubject as Subject
-    } catch (err: any) {
-      console.error("Error updating subject:", err.message)
-      setError(err.message)
-      toast("Failed to update subject: " + err.message, "error")
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err)
+      console.error("Error updating subject:", errorMsg)
+      setError(errorMsg)
+      toast("Failed to update subject: " + errorMsg, "error")
       throw err
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, setLoading, setError, updateSubjectInStore, toast])
 
-  const deleteSubject = async (id: string) => {
+  const deleteSubject = useCallback(async (id: string) => {
     setLoading(true)
     setError(null)
     try {
@@ -217,15 +221,16 @@ export function useSubjects() {
 
       removeSubject(id)
       toast("Subject deleted successfully!", "success")
-    } catch (err: any) {
-      console.error("Error deleting subject:", err.message)
-      setError(err.message)
-      toast("Failed to delete subject: " + err.message, "error")
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : String(err)
+      console.error("Error deleting subject:", errorMsg)
+      setError(errorMsg)
+      toast("Failed to delete subject: " + errorMsg, "error")
       throw err
     } finally {
       setLoading(false)
     }
-  }
+  }, [setLoading, setError, removeSubject, toast])
 
   return {
     subjects,

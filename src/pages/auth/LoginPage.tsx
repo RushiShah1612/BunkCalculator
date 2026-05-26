@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -21,6 +21,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [toastMsg, setToastMsg] = useState<string | null>(null)
+
+  useEffect(() => {
+    document.title = "Log In | RollCall"
+  }, [])
 
   const {
     register: registerField,
@@ -51,9 +55,9 @@ export default function LoginPage() {
     try {
       await login(data.email, data.password)
       navigate("/")
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Login submission error:", err)
-      const rawMsg = err?.message || "An unexpected authentication error occurred."
+      const rawMsg = err instanceof Error ? err.message : "An unexpected authentication error occurred."
       setErrorMsg(translateError(rawMsg))
     }
   }
@@ -95,19 +99,21 @@ export default function LoginPage() {
         {/* Login Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 pl-1">
+            <label htmlFor="email" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5 pl-1">
               Email Address
             </label>
             <input
+              id="email"
               type="email"
               placeholder="name@university.edu"
               {...registerField("email")}
+              aria-describedby={errors.email ? "email-error" : undefined}
               className={`w-full px-4 py-3 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                 errors.email ? "border-danger focus:ring-danger/50" : "border-border"
               }`}
             />
             {errors.email && (
-              <span className="text-xs text-danger mt-1 block pl-1">
+              <span id="email-error" className="text-xs text-danger mt-1 block pl-1">
                 {errors.email.message}
               </span>
             )}
@@ -115,7 +121,7 @@ export default function LoginPage() {
 
           <div>
             <div className="flex justify-between items-center mb-1.5 pl-1">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              <label htmlFor="password" className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Password
               </label>
               <a
@@ -128,9 +134,11 @@ export default function LoginPage() {
             </div>
             <div className="relative">
               <input
+                id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 {...registerField("password")}
+                aria-describedby={errors.password ? "password-error" : undefined}
                 className={`w-full px-4 py-3 pr-10 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                   errors.password ? "border-danger focus:ring-danger/50" : "border-border"
                 }`}
@@ -138,13 +146,14 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             {errors.password && (
-              <span className="text-xs text-danger mt-1 block pl-1">
+              <span id="password-error" className="text-xs text-danger mt-1 block pl-1">
                 {errors.password.message}
               </span>
             )}

@@ -100,7 +100,10 @@ export function useDashboardData(): DashboardData {
   }, [user, fetchSubjects, fetchRecordsByDateRange, fetchRecordsByDate])
 
   useEffect(() => {
-    fetchAll()
+    const timer = setTimeout(() => {
+      fetchAll()
+    }, 0)
+    return () => clearTimeout(timer)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshToken])
 

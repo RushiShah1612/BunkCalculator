@@ -207,3 +207,36 @@ CREATE TRIGGER on_auth_user_created
 CREATE INDEX IF NOT EXISTS idx_attendance_records_user_date ON public.attendance_records(user_id, date);
 CREATE INDEX IF NOT EXISTS idx_attendance_records_class_type ON public.attendance_records(class_type_id);
 CREATE INDEX IF NOT EXISTS idx_subjects_user_id ON public.subjects(user_id);
+
+
+-- 7. SHARED REPORTS TABLE
+CREATE TABLE IF NOT EXISTS public.shared_reports (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  report_data JSONB NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS on shared_reports
+ALTER TABLE public.shared_reports ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Anyone can read shared reports" ON public.shared_reports;
+DROP POLICY IF EXISTS "Users can insert their own shared reports" ON public.shared_reports;
+DROP POLICY IF EXISTS "Users can delete their own shared reports" ON public.shared_reports;
+
+-- Create policies for shared_reports
+CREATE POLICY "Anyone can read shared reports" 
+  ON public.shared_reports FOR SELECT 
+  USING (true);
+
+CREATE POLICY "Users can insert their own shared reports" 
+  ON public.shared_reports FOR INSERT 
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own shared reports" 
+  ON public.shared_reports FOR DELETE 
+  USING (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_shared_reports_user ON public.shared_reports(user_id);

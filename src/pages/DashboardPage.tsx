@@ -8,6 +8,9 @@ import { useAttendance } from "../hooks/useAttendance"
 import { useDashboardData } from "../hooks/useDashboardData"
 import { useNotificationAlerts } from "../hooks/useNotificationAlerts"
 import type { AttendanceStatus, Subject } from "../types"
+import { useToastStore } from "../store/toastStore"
+import { seedDemoData, clearDemoData } from "../lib/seedDemoData"
+import { useEffect } from "react"
 import {
   BarChart,
   Bar,
@@ -462,7 +465,10 @@ function TodayQuickLog({ subjects, todayRecords, onRefresh }: TodayQuickLogProps
 // ─── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { profile } = useAuthStore()
+  const { profile, user } = useAuthStore()
+  const { toast } = useToastStore()
+  const [seederLoading, setSeederLoading] = useState(false)
+
   const {
     subjects,
     subjectStats,
@@ -475,9 +481,39 @@ export default function DashboardPage() {
     refresh,
   } = useDashboardData()
 
+  // Set document title
+  useEffect(() => {
+    document.title = "Dashboard | RollCall"
+  }, [])
+
   // Generate automated notifications based on current statistics
   useNotificationAlerts(subjectStats)
 
+  const handleDemoDataToggle = async () => {
+    if (!user) return
+    setSeederLoading(true)
+    try {
+      const isDemoLoaded = localStorage.getItem("demo-data-loaded") === "true"
+      if (isDemoLoaded) {
+        await clearDemoData(user.id)
+        localStorage.removeItem("demo-data-loaded")
+        toast("Demo data cleared successfully", "success")
+      } else {
+        await seedDemoData(user.id)
+        localStorage.setItem("demo-data-loaded", "true")
+        toast("Demo data seeded successfully!", "success")
+      }
+      refresh()
+    } catch (err: unknown) {
+      console.error(err)
+      const errorMsg = err instanceof Error ? err.message : "Failed to process demo data"
+      toast(errorMsg, "error")
+    } finally {
+      setSeederLoading(false)
+    }
+  }
+
+  const isDemoLoaded = localStorage.getItem("demo-data-loaded") === "true"
   const firstName = profile?.full_name?.split(" ")[0] ?? "there"
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long", year: "numeric", month: "long", day: "numeric",
@@ -507,6 +543,17 @@ export default function DashboardPage() {
           )}
         </div>
         <div className="flex items-center gap-2">
+          {isDemoLoaded && (
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={handleDemoDataToggle}
+              disabled={seederLoading}
+              className="rounded-xl h-9 text-xs gap-1.5"
+            >
+              {seederLoading ? "Clearing..." : "Clear Demo Data"}
+            </Button>
+          )}
           <Button
             size="sm"
             variant="outline"
@@ -597,13 +644,24 @@ export default function DashboardPage() {
             {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-56" />)}
           </div>
         ) : subjects.length === 0 ? (
-          <div className="bg-card border border-border rounded-3xl flex flex-col items-center justify-center py-16 text-center">
+          <div className="bg-card border border-border rounded-3xl flex flex-col items-center justify-center py-16 text-center px-4">
             <BookOpen className="w-12 h-12 text-muted-foreground/30 mb-4" />
             <p className="font-semibold text-foreground mb-1">No subjects yet</p>
-            <p className="text-xs text-muted-foreground mb-4">Add your subjects to start tracking attendance</p>
-            <Link to="/subjects">
-              <Button size="sm" className="rounded-xl">Add Subjects</Button>
-            </Link>
+            <p className="text-xs text-muted-foreground mb-4">Add your subjects or load realistic demo data to test the tracker</p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <Link to="/subjects">
+                <Button size="sm" className="rounded-xl">Add Subjects</Button>
+              </Link>
+              <Button
+                size="sm"
+                variant={isDemoLoaded ? "destructive" : "secondary"}
+                onClick={handleDemoDataToggle}
+                disabled={seederLoading}
+                className="rounded-xl"
+              >
+                {seederLoading ? "Processing..." : isDemoLoaded ? "Clear Demo Data" : "Load Demo Data"}
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

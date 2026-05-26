@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { PageWrapper } from "../components/layout/PageWrapper"
 import { useAuthStore } from "../store/authStore"
@@ -248,6 +248,10 @@ export default function ProfilePage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+
+  useEffect(() => {
+    document.title = "My Profile | RollCall"
+  }, [])
 
   const handleDeleteAccount = async () => {
     setDeleteLoading(true)

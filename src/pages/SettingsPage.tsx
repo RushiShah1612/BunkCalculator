@@ -80,6 +80,10 @@ export default function SettingsPage() {
   const { subjects } = useSubjectStore()
   const { toast } = useToastStore()
 
+  useEffect(() => {
+    document.title = "Settings | RollCall"
+  }, [])
+
   // Theme
   const [theme, setThemeState] = useState<Theme>(getStoredTheme)
   const changeTheme = (t: Theme) => {
@@ -136,16 +140,15 @@ export default function SettingsPage() {
   }
 
   // Notifications
-  const [notifPermission, setNotifPermission] = useState<NotificationPermission>("default")
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      return Notification.permission
+    }
+    return "default"
+  })
   const [reminderTime, setReminderTime] = useState(
     localStorage.getItem("reminder-time") ?? "21:00"
   )
-
-  useEffect(() => {
-    if ("Notification" in window) {
-      setNotifPermission(Notification.permission)
-    }
-  }, [])
 
   const requestNotifications = async () => {
     if (!("Notification" in window)) {

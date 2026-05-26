@@ -13,37 +13,24 @@ interface NavbarProps {
 export function Navbar({ title }: NavbarProps) {
   const { user, profile, logout } = useAuth()
   const [isDark, setIsDark] = useState(() => {
-    return document.documentElement.classList.contains("dark")
+    const storedTheme = localStorage.getItem("theme")
+    if (storedTheme) return storedTheme === "dark"
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
   })
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   const toggleTheme = () => {
-    const root = document.documentElement
-    if (root.classList.contains("dark")) {
-      root.classList.remove("dark")
-      localStorage.setItem("theme", "light")
-      setIsDark(false)
-    } else {
-      root.classList.add("dark")
-      localStorage.setItem("theme", "dark")
-      setIsDark(true)
-    }
+    setIsDark(prev => {
+      const next = !prev
+      localStorage.setItem("theme", next ? "dark" : "light")
+      return next
+    })
   }
 
   // Ensure theme is synced on mount
   useEffect(() => {
-    const storedTheme = localStorage.getItem("theme")
-    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-    const root = document.documentElement
-
-    if (storedTheme === "dark" || (!storedTheme && systemPrefersDark)) {
-      root.classList.add("dark")
-      setIsDark(true)
-    } else {
-      root.classList.remove("dark")
-      setIsDark(false)
-    }
-  }, [])
+    document.documentElement.classList.toggle("dark", isDark)
+  }, [isDark])
 
   return (
     <>

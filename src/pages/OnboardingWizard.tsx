@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSubjects } from "../hooks/useSubjects"
 import { useAuthStore } from "../store/authStore"
@@ -289,8 +289,11 @@ const STEPS = 3
 
 export default function OnboardingWizard() {
   const [step, setStep] = useState(0)
-  const [_createdSubjectId, setCreatedSubjectId] = useState<string | null>(null)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    document.title = "Welcome to RollCall"
+  }, [])
 
   const finish = () => {
     localStorage.setItem("onboarding-done", "true")
@@ -316,7 +319,7 @@ export default function OnboardingWizard() {
             <StepAddSubject
               onNext={() => setStep(2)}
               onSkip={() => setStep(2)}
-              onSubjectCreated={(id) => setCreatedSubjectId(id)}
+              onSubjectCreated={() => {}}
             />
           )}
           {step === 2 && <StepFinish onFinish={finish} />}

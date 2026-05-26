@@ -4,6 +4,9 @@ import { useAnalyticsData } from "../hooks/useAnalyticsData"
 import { useSubjectStore } from "../store/subjectStore"
 import { useSubjects } from "../hooks/useSubjects"
 import { useEffect } from "react"
+import { supabase } from "../lib/supabase"
+import { useToastStore } from "../store/toastStore"
+import { calculateClassTypeStats, calculateOverallStats } from "../lib/calculations"
 import {
   generateCSV,
   downloadCSV,
@@ -39,6 +42,7 @@ import {
   ArrowUpDown,
   Activity,
   FileText,
+  Share2,
 } from "lucide-react"
 import { Button } from "../components/ui/button"
 import type { AttendanceRecord, AttendanceStatus } from "../types"
@@ -689,7 +693,7 @@ function AttendanceLogTable({
     setPage(1)
   }
 
-  const SortBtn = ({ k, label }: { k: SortKey; label: string }) => (
+  const renderSortBtn = (k: SortKey, label: string) => (
     <button
       onClick={() => handleSort(k)}
       className="flex items-center gap-1 hover:text-foreground transition-colors font-bold text-xs uppercase tracking-wider"
@@ -735,11 +739,11 @@ function AttendanceLogTable({
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border/60 text-muted-foreground">
-                <th className="px-5 py-3 text-left"><SortBtn k="date" label="Date" /></th>
-                <th className="px-5 py-3 text-left"><SortBtn k="subject" label="Subject" /></th>
-                <th className="px-5 py-3 text-left"><SortBtn k="classType" label="Class Type" /></th>
-                <th className="px-5 py-3 text-left"><SortBtn k="status" label="Status" /></th>
-                <th className="px-5 py-3 text-left"><SortBtn k="hours" label="Hours" /></th>
+                <th className="px-5 py-3 text-left">{renderSortBtn("date", "Date")}</th>
+                <th className="px-5 py-3 text-left">{renderSortBtn("subject", "Subject")}</th>
+                <th className="px-5 py-3 text-left">{renderSortBtn("classType", "Class Type")}</th>
+                <th className="px-5 py-3 text-left">{renderSortBtn("status", "Status")}</th>
+                <th className="px-5 py-3 text-left">{renderSortBtn("hours", "Hours")}</th>
                 <th className="px-5 py-3 text-left text-xs font-bold uppercase tracking-wider">Notes</th>
               </tr>
             </thead>
@@ -880,7 +884,9 @@ const PRINT_STYLES = `
 export default function AnalyticsPage() {
   const { subjects } = useSubjectStore()
   const { fetchSubjects } = useSubjects()
-  const { profile } = useAuthStore()
+  const { profile, user } = useAuthStore()
+  const { toast } = useToastStore()
+  const [shareLoading, setShareLoading] = useState(false)
 
   const {
     allRecords,
@@ -896,10 +902,79 @@ export default function AnalyticsPage() {
     refresh,
   } = useAnalyticsData()
 
+  // Set document title
+  useEffect(() => {
+    document.title = "Analytics & Insights | RollCall"
+  }, [])
+
   // Ensure subjects are loaded
   useEffect(() => {
     if (subjects.length === 0) fetchSubjects()
-  }, [])
+  }, [fetchSubjects, subjects.length])
+
+  const handleShareReport = async () => {
+    if (!user) return
+    setShareLoading(true)
+    try {
+      // Calculate statistics for each subject in subjects list
+      const overallSubjects = subjects.map(s => {
+        const ctStats = s.class_types.map(ct => calculateClassTypeStats(ct, allRecords))
+        const agg = calculateOverallStats(ctStats)
+        return {
+          name: s.name,
+          code: s.code,
+          color: s.color_tag,
+          percentage: agg.overallPercentage,
+          classTypes: ctStats.map(stat => ({
+            name: stat.classTypeName,
+            percentage: stat.currentPercentage,
+            attended: stat.hoursPresent,
+            total: stat.hoursHeld
+          }))
+        }
+      })
+
+      // Aggregate overall attendance percentage
+      const allClassTypeStats = subjects.flatMap(s => 
+        s.class_types.map(ct => calculateClassTypeStats(ct, allRecords))
+      )
+      const globalOverall = calculateOverallStats(allClassTypeStats).overallPercentage
+
+      const reportData = {
+        studentName: profile?.full_name || user.email || "Student",
+        semester: profile?.semester || "N/A",
+        overallAttendance: globalOverall,
+        subjects: overallSubjects
+      }
+
+      // Expires in 7 days
+      const expiresAt = new Date()
+      expiresAt.setDate(expiresAt.getDate() + 7)
+
+      const { data, error: insertError } = await supabase
+        .from("shared_reports")
+        .insert({
+          user_id: user.id,
+          report_data: reportData,
+          expires_at: expiresAt.toISOString()
+        })
+        .select()
+        .single()
+
+      if (insertError) throw insertError
+      if (!data) throw new Error("Failed to generate shared report link")
+
+      const shareUrl = `${window.location.origin}/report/${data.id}`
+      await navigator.clipboard.writeText(shareUrl)
+      toast("Shareable report link copied to clipboard! Expires in 7 days.", "success")
+    } catch (err: unknown) {
+      console.error(err)
+      const errorMsg = err instanceof Error ? err.message : "Failed to share report"
+      toast(errorMsg, "error")
+    } finally {
+      setShareLoading(false)
+    }
+  }
 
   const filteredSubjects = useMemo(
     () =>
@@ -931,8 +1006,18 @@ export default function AnalyticsPage() {
             className="rounded-xl"
             onClick={refresh}
           >
-            <RefreshCw className="w-4 h-4 mr-1.5" />
+            <RefreshCw className="w-4 h-4 mr-1.5 animate-spin-hover" />
             Refresh
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl"
+            onClick={handleShareReport}
+            disabled={shareLoading || subjects.length === 0}
+          >
+            <Share2 className="w-4 h-4 mr-1.5 text-primary" />
+            {shareLoading ? "Sharing..." : "Share"}
           </Button>
           <ExportMenu
             records={filteredRecords}

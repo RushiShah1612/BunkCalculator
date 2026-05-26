@@ -346,28 +346,31 @@ function HistoryTab({ subjects }: HistoryTabProps) {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null)
 
   useEffect(() => {
-    setLoading(true)
-    fetchAllRecords()
-      .then((data) => {
-        // Enrich records with subject/ct names
-        const enriched = data.map((r) => {
-          let subjectName = ""
-          let ctName = ""
-          let colorTag = ""
-          for (const sub of subjects) {
-            const ct = sub.class_types.find((c) => c.id === r.class_type_id)
-            if (ct) {
-              subjectName = sub.name
-              ctName = ct.name
-              colorTag = sub.color_tag
-              break
+    const timer = setTimeout(() => {
+      setLoading(true)
+      fetchAllRecords()
+        .then((data) => {
+          // Enrich records with subject/ct names
+          const enriched = data.map((r) => {
+            let subjectName = ""
+            let ctName = ""
+            let colorTag = ""
+            for (const sub of subjects) {
+              const ct = sub.class_types.find((c) => c.id === r.class_type_id)
+              if (ct) {
+                subjectName = sub.name
+                ctName = ct.name
+                colorTag = sub.color_tag
+                break
+              }
             }
-          }
-          return { ...r, _subjectName: subjectName, _ctName: ctName, _colorTag: colorTag }
+            return { ...r, _subjectName: subjectName, _ctName: ctName, _colorTag: colorTag }
+          })
+          setRecords(enriched)
         })
-        setRecords(enriched)
-      })
-      .finally(() => setLoading(false))
+        .finally(() => setLoading(false))
+    }, 0)
+    return () => clearTimeout(timer)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -651,6 +654,10 @@ export default function AttendancePage() {
   const [saving, setSaving] = useState(false)
   const [fabOpen, setFabOpen] = useState(false)
 
+  useEffect(() => {
+    document.title = "Log Attendance | RollCall"
+  }, [])
+
   const { subjects, fetchSubjects } = useSubjects()
   const {
     fetchRecordsByDate,
@@ -675,7 +682,10 @@ export default function AttendancePage() {
 
   useEffect(() => {
     const [y, m] = selectedDate.split("-").map(Number)
-    loadMonthSummary(y, m)
+    const timer = setTimeout(() => {
+      loadMonthSummary(y, m)
+    }, 0)
+    return () => clearTimeout(timer)
   }, [selectedDate, loadMonthSummary])
 
   // When date changes, load that day's records into form state
@@ -695,7 +705,10 @@ export default function AttendancePage() {
   )
 
   useEffect(() => {
-    loadDayRecords(selectedDate)
+    const timer = setTimeout(() => {
+      loadDayRecords(selectedDate)
+    }, 0)
+    return () => clearTimeout(timer)
   }, [selectedDate, loadDayRecords])
 
   const handleSelectDate = (date: string) => {

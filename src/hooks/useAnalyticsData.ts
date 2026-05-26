@@ -63,19 +63,23 @@ export function useAnalyticsData(): AnalyticsData {
   // Fetch ALL records for this user (analytics needs full history)
   useEffect(() => {
     if (!user) return
-    setLoading(true)
+    const timer = setTimeout(() => {
+      setLoading(true)
 
-    supabase
-      .from("attendance_records")
-      .select("*, class_types!inner(subject_id, subjects!inner(user_id))")
-      .eq("class_types.subjects.user_id", user.id)
-      .order("date", { ascending: true })
-      .then(({ data, error }) => {
-        if (!error && data) {
-          setAllRecords(data as AttendanceRecord[])
-        }
-        setLoading(false)
-      })
+      supabase
+        .from("attendance_records")
+        .select("*, class_types!inner(subject_id, subjects!inner(user_id))")
+        .eq("class_types.subjects.user_id", user.id)
+        .order("date", { ascending: true })
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setAllRecords(data as AttendanceRecord[])
+          }
+          setLoading(false)
+        })
+    }, 0)
+
+    return () => clearTimeout(timer)
   }, [user, refreshToken])
 
   // Derive date range from filters

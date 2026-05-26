@@ -43,10 +43,11 @@ export default function SubjectsPage() {
   const [deletingSubject, setDeletingSubject] = useState<Subject | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
 
-  // Fetch subjects on mount
+  // Fetch subjects and set title on mount
   useEffect(() => {
+    document.title = "Subjects | RollCall"
     fetchSubjects()
-  }, [])
+  }, [fetchSubjects])
 
   const handleOpenAddModal = () => {
     setEditingSubject(null)
@@ -58,13 +59,13 @@ export default function SubjectsPage() {
     setIsModalOpen(true)
   }
 
-  const handleModalSubmit = async (formData: any) => {
+  const handleModalSubmit = async (formData: unknown) => {
     setModalLoading(true)
     try {
       if (editingSubject) {
-        await updateSubject(editingSubject.id, formData)
+        await updateSubject(editingSubject.id, formData as Parameters<typeof updateSubject>[1])
       } else {
-        await createSubject(formData)
+        await createSubject(formData as Parameters<typeof createSubject>[0])
       }
       setIsModalOpen(false)
     } finally {

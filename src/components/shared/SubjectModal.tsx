@@ -56,7 +56,7 @@ type SubjectFormValues = z.infer<typeof subjectFormSchema>
 interface SubjectModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: any) => Promise<any>
+  onSubmit: (data: unknown) => Promise<unknown>
   subject?: Subject | null // If present, we are in Edit mode
   loading: boolean
 }

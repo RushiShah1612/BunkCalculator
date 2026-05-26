@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react"
+import { useState, useMemo, useCallback, useEffect } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 import { PageWrapper } from "../components/layout/PageWrapper"
 import { Button } from "../components/ui/button"
@@ -908,6 +908,14 @@ export default function SubjectDetailPage() {
     upsertRecord,
   } = useSubjectDetail(id ?? "")
 
+  useEffect(() => {
+    if (subject) {
+      document.title = `${subject.name} | RollCall`
+    } else {
+      document.title = "Subject Details | RollCall"
+    }
+  }, [subject])
+
   // Calendar state
   const today = new Date()
   const [calYear, setCalYear] = useState(today.getFullYear())
@@ -925,14 +933,14 @@ export default function SubjectDetailPage() {
       if (m === 1) { setCalYear((y) => y - 1); return 12 }
       return m - 1
     })
-  }, [])
+  }, [setCalYear])
 
   const handleNextMonth = useCallback(() => {
     setCalMonth((m) => {
       if (m === 12) { setCalYear((y) => y + 1); return 1 }
       return m + 1
     })
-  }, [])
+  }, [setCalYear])
 
   const handleEditSubmit = async (formData: unknown) => {
     if (!subject) return
