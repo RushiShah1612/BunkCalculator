@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 import { PageWrapper } from "../components/layout/PageWrapper"
 import { useSubjects } from "../hooks/useSubjects"
 import { SubjectModal } from "../components/shared/SubjectModal"
 import { ConfirmDialog } from "../components/shared/ConfirmDialog"
 import { EmptyState } from "../components/shared/EmptyState"
 import { Button } from "../components/ui/button"
-import { Plus, Edit3, Trash2, BookOpen } from "lucide-react"
+import { Plus, Edit3, Trash2, BookOpen, ExternalLink } from "lucide-react"
 import type { Subject } from "../types"
 
 // Pulse Card Skeleton
@@ -126,11 +127,6 @@ export default function SubjectsPage() {
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 animate-in fade-in duration-300">
           {subjects.map((sub) => {
-            // Calculate total expected hours across all class components
-            const totalHours = sub.class_types.reduce(
-              (acc, ct) => acc + (Number(ct.total_hours) || 0),
-              0
-            )
 
             return (
               <div
@@ -181,9 +177,13 @@ export default function SubjectsPage() {
 
                 {/* Footer status summary & Actions */}
                 <div className="p-3 md:p-4 px-4 md:px-6 flex justify-between items-center bg-card">
-                  <span className="text-[10px] font-medium text-muted-foreground">
-                    Total: {totalHours} hrs expected
-                  </span>
+                  <Link
+                    to={`/subjects/${sub.id}`}
+                    className="text-[10px] font-semibold text-primary hover:underline flex items-center gap-1"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    View Details
+                  </Link>
                   <div className="flex space-x-1">
                     <Button 
                       size="icon" 

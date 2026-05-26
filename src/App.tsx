@@ -8,6 +8,7 @@ import LoginPage from "./pages/auth/LoginPage"
 import RegisterPage from "./pages/auth/RegisterPage"
 import DashboardPage from "./pages/DashboardPage"
 import SubjectsPage from "./pages/SubjectsPage"
+import SubjectDetailPage from "./pages/SubjectDetailPage"
 import AttendancePage from "./pages/AttendancePage"
 import AnalyticsPage from "./pages/AnalyticsPage"
 import NotFoundPage from "./pages/NotFoundPage"
@@ -66,6 +67,7 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardPage />} />
           <Route path="/subjects" element={<SubjectsPage />} />
+          <Route path="/subjects/:id" element={<SubjectDetailPage />} />
           <Route path="/attendance" element={<AttendancePage />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
         </Route>
