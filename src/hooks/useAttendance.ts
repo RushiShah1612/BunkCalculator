@@ -156,7 +156,11 @@ export function useAttendance() {
 
         toast("Attendance saved!", "success")
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Unknown error"
+        const msg = err instanceof Error
+          ? err.message
+          : (err && typeof err === "object" && "message" in err)
+            ? String((err as any).message)
+            : "Unknown error"
         console.error("upsertAttendance error:", msg)
         toast("Failed to save: " + msg, "error")
         throw err
@@ -185,7 +189,11 @@ export function useAttendance() {
         deleteAttendanceRecord(id)
         toast("Record deleted.", "success")
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Unknown error"
+        const msg = err instanceof Error
+          ? err.message
+          : (err && typeof err === "object" && "message" in err)
+            ? String((err as any).message)
+            : "Delete failed"
         toast("Delete failed: " + msg, "error")
         throw err
       } finally {

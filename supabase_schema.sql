@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS public.attendance_records (
   status TEXT CHECK (status IN ('PRESENT','ABSENT','CANCELLED','HOLIDAY')) NOT NULL,
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(class_type_id, date, created_at)
+  UNIQUE(class_type_id, date)
 );
 
 -- Enable RLS on attendance_records
