@@ -182,7 +182,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] overflow-y-auto rounded-none sm:rounded-3xl border-none sm:border bg-card p-0 shadow-2xl flex flex-col">
+      <DialogContent showCloseButton={false} className="sm:max-w-2xl w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] overflow-y-auto rounded-none sm:rounded-3xl border-none sm:border bg-card p-0 shadow-2xl flex flex-col">
         {/* Header */}
         <DialogHeader className="p-6 pb-4 border-b border-border flex flex-row justify-between items-center">
           <DialogTitle className="text-xl font-bold text-foreground">
