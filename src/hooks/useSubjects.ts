@@ -38,7 +38,11 @@ export function useSubjects() {
       if (selectError) throw selectError
       setSubjects(data as Subject[])
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : String(err)
+      const errorMsg = err instanceof Error
+        ? err.message
+        : (err && typeof err === "object" && "message" in err)
+          ? String((err as any).message)
+          : String(err)
       console.error("Error fetching subjects:", errorMsg)
       setError(errorMsg)
       toast("Failed to load subjects: " + errorMsg, "error")
@@ -98,7 +102,11 @@ export function useSubjects() {
       toast("Subject created successfully!", "success")
       return completeSubject
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : String(err)
+      const errorMsg = err instanceof Error
+        ? err.message
+        : (err && typeof err === "object" && "message" in err)
+          ? String((err as any).message)
+          : String(err)
       console.error("Error creating subject:", errorMsg)
       setError(errorMsg)
       toast("Failed to create subject: " + errorMsg, "error")
@@ -200,7 +208,11 @@ export function useSubjects() {
       toast("Subject updated successfully!", "success")
       return updatedSubject as Subject
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : String(err)
+      const errorMsg = err instanceof Error
+        ? err.message
+        : (err && typeof err === "object" && "message" in err)
+          ? String((err as any).message)
+          : String(err)
       console.error("Error updating subject:", errorMsg)
       setError(errorMsg)
       toast("Failed to update subject: " + errorMsg, "error")
@@ -224,7 +236,11 @@ export function useSubjects() {
       removeSubject(id)
       toast("Subject deleted successfully!", "success")
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : String(err)
+      const errorMsg = err instanceof Error
+        ? err.message
+        : (err && typeof err === "object" && "message" in err)
+          ? String((err as any).message)
+          : String(err)
       console.error("Error deleting subject:", errorMsg)
       setError(errorMsg)
       toast("Failed to delete subject: " + errorMsg, "error")
