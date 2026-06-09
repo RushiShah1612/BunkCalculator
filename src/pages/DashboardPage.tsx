@@ -236,9 +236,9 @@ function SubjectDetailCard({
             </div>
           </div>
           <div className="text-right shrink-0">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Safe bunks</p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Safe bunk hrs</p>
             <p className={`text-xl font-black ${totalSafeBunks > 0 ? "text-green-500" : "text-red-500"}`}>
-              {totalSafeBunks}
+              {totalSafeBunks}h
             </p>
           </div>
         </div>
@@ -266,7 +266,7 @@ function SubjectDetailCard({
                   </span>
                 ) : cts.safeBunks > 0 ? (
                   <span className="text-[10px] font-bold text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-1.5 py-0.5 rounded-lg">
-                    -{cts.safeBunks}
+                    -{cts.safeBunks}h
                   </span>
                 ) : null}
               </div>
@@ -611,12 +611,12 @@ export default function DashboardPage() {
             colorClass={overallStatusColor}
           />
           <StatCard
-            label="Safe Bunks"
+            label="Safe Bunk Hours"
             value={overallStats.totalSafeBunks}
             subtitle={
               overallStats.totalSafeBunks === 0
-                ? "No safe bunks remaining!"
-                : "Classes you can safely skip"
+                ? "No safe hours remaining!"
+                : "Hours you can safely miss"
             }
             icon={<ShieldCheck className="w-4 h-4" />}
             colorClass={overallStats.totalSafeBunks === 0 ? "text-red-500" : "text-green-500"}

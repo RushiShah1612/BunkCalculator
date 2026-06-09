@@ -44,23 +44,28 @@ export function calculateProjectedPercentage(
 // ─── C) calculateSafeBunks ───────────────────────────────────────────────────
 
 /**
- * Calculates how many additional sessions the student can safely skip while
- * still meeting the minimum attendance requirement at end of semester.
+ * Calculates how many hours the student can miss RIGHT NOW before their
+ * current attendance percentage drops below the minimum.
  *
  * Formula:
- *   requiredHours = (minAttendancePercent / 100) × totalSemesterHours
- *   hoursCan miss  = hoursPresent − requiredHours
- *   safeSessions   = floor(hoursCan miss / hoursPerSession)
+ *   We need: hoursPresent / (hoursHeld + missedHours) ≥ minPct / 100
+ *   Solving: missedHours ≤ (hoursPresent × 100 − minPct × hoursHeld) / minPct
+ *   But missed hours must be in whole-session increments, so:
+ *   safeSessions = floor(missedHours / hoursPerSession)
+ *   safeHours    = safeSessions × hoursPerSession
  *
  * @param hoursPresent          - Current hours attended
  * @param hoursHeld             - Current hours classes were held
- * @param totalSemesterHours    - Total planned hours for the semester
+ * @param totalSemesterHours    - Total planned hours for the semester (kept for API compat)
  * @param minAttendancePercent  - Minimum required attendance percentage (e.g. 75)
  * @param hoursPerSession       - Duration of each session in hours
- * @returns Number of sessions that can still be bunked; minimum 0
+ * @returns Number of hours that can be safely missed; minimum 0
  *
  * @example
- * calculateSafeBunks(40, 45, 60, 75, 1) // → positive number; can skip some classes
+ * // 12 present out of 14 held, 75% min, 1hr sessions → 2 hours
+ * calculateSafeBunks(12, 14, 45, 75, 1) // → 2
+ * // 24 present out of 30 held, 75% min, 2hr sessions → 2 hours (1 session × 2h)
+ * calculateSafeBunks(24, 30, 60, 75, 2) // → 2
  */
 export function calculateSafeBunks(
   hoursPresent: number,
@@ -69,14 +74,14 @@ export function calculateSafeBunks(
   minAttendancePercent: number,
   hoursPerSession: number
 ): number {
-  if (hoursPerSession <= 0) return 0
-  const requiredHours = (minAttendancePercent / 100) * totalSemesterHours
-  const hoursCanMiss = hoursPresent - requiredHours
-  const safeSessions = Math.floor(hoursCanMiss / hoursPerSession)
-  // Suppress unused parameter warning — hoursHeld is intentionally kept for
-  // API symmetry and future-proofing (e.g. current % guard callers may add).
-  void hoursHeld
-  return Math.max(0, safeSessions)
+  if (hoursPerSession <= 0 || minAttendancePercent <= 0) return 0
+  // totalSemesterHours kept for API compatibility but not used in this formula
+  void totalSemesterHours
+
+  const numerator = hoursPresent * 100 - minAttendancePercent * hoursHeld
+  const denominator = minAttendancePercent * hoursPerSession
+  const safeSessions = Math.floor(numerator / denominator)
+  return Math.max(0, safeSessions * hoursPerSession)
 }
 
 // ─── D) calculateClassesNeeded ───────────────────────────────────────────────

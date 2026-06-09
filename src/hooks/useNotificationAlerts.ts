@@ -56,7 +56,7 @@ export function useNotificationAlerts(subjectStats: SubjectWithStats[]) {
       }
       // 3. Safe Bunk Milestone
       else if (totalSafeBunks > 0) {
-        const title = `Safe Bunks Available: ${subject.name}`
+        const title = `Safe Bunk Hours: ${subject.name}`
         const exists = notifications.some(
           (n) => n.title === title && now - new Date(n.createdAt).getTime() < oneDayMs
         )
@@ -65,7 +65,7 @@ export function useNotificationAlerts(subjectStats: SubjectWithStats[]) {
           addNotification({
             type: "success",
             title,
-            message: `Great news! You have a safe buffer of ${totalSafeBunks} class${totalSafeBunks > 1 ? "es" : ""} that you can bunk for ${subject.name}.`,
+            message: `Great news! You have a safe buffer of ${totalSafeBunks} hour${totalSafeBunks > 1 ? "s" : ""} that you can miss for ${subject.name}.`,
           })
         }
       }

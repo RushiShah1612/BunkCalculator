@@ -81,21 +81,24 @@ describe("calculateProjectedPercentage", () => {
 // ─── calculateSafeBunks ──────────────────────────────────────────────────────
 
 describe("calculateSafeBunks", () => {
-  it("student with 80% in a 75%-required course → positive bunks", () => {
-    // 48 present, 60 total semester hours, 75% min, 1hr/session
-    // required = 0.75 * 60 = 45; can miss = 48 - 45 = 3; safe sessions = 3
-    const result = calculateSafeBunks(48, 55, 60, 75, 1)
-    expect(result).toBeGreaterThan(0)
+  it("user's example: 12 present / 14 held, 75% min, 1hr sessions → 2 hours", () => {
+    // 12/16 = 75% (ok), 12/17 = 70.6% (below) → can miss 2 hours
+    const result = calculateSafeBunks(12, 14, 45, 75, 1)
+    expect(result).toBe(2)
   })
 
-  it("student exactly at 75% threshold → 0 bunks", () => {
-    // 45 present, 60 total, need 75% of 60 = 45 → can miss 0
+  it("student with 80% (48/60), 1hr sessions → 4 hours", () => {
+    // n = floor((4800-4500)/75) = 4 sessions × 1h = 4 hours
+    const result = calculateSafeBunks(48, 60, 60, 75, 1)
+    expect(result).toBe(4)
+  })
+
+  it("student exactly at 75% threshold → 0 hours", () => {
     const result = calculateSafeBunks(45, 60, 60, 75, 1)
     expect(result).toBe(0)
   })
 
-  it("student at 60% in a 75%-required course → 0 bunks (cannot bunk)", () => {
-    // Below minimum → still returns 0, not negative
+  it("student below 75% → 0 hours (cannot bunk)", () => {
     const result = calculateSafeBunks(18, 30, 60, 75, 1)
     expect(result).toBe(0)
   })
@@ -105,11 +108,17 @@ describe("calculateSafeBunks", () => {
     expect(result).toBeGreaterThanOrEqual(0)
   })
 
-  it("accounts for hours per session > 1", () => {
-    // 40 present out of 60 total, 75% needed → 45 required → can miss 0 sessions
-    // With 2hr/session: floor(-5/2) → still 0
-    const result = calculateSafeBunks(40, 60, 60, 75, 2)
-    expect(result).toBeGreaterThanOrEqual(0)
+  it("2hr sessions: returns hours not sessions", () => {
+    // 24 present / 30 held → 80%, 2hr sessions, 75% min
+    // safeSessions = floor((2400-2250)/150) = 1 session → 1 × 2 = 2 hours
+    // Verify: 24/32 = 75% ✓, 24/34 = 70.6% ✗
+    const result = calculateSafeBunks(24, 30, 60, 75, 2)
+    expect(result).toBe(2)
+  })
+
+  it("no classes held yet → 0 hours", () => {
+    const result = calculateSafeBunks(0, 0, 60, 75, 1)
+    expect(result).toBe(0)
   })
 })
 

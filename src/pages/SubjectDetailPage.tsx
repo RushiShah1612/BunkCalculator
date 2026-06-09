@@ -399,7 +399,7 @@ function StatsCard({ stats, color, onMinChange }: StatsCardProps) {
             <div className="flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-3">
               <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
               <p className="text-sm font-medium text-green-700 dark:text-green-400">
-                You can safely skip <strong>{stats.safeBunks}</strong> more sessions
+                You can safely miss <strong>{stats.safeBunks}</strong> more hour{stats.safeBunks !== 1 ? "s" : ""}
               </p>
             </div>
             <div className="flex items-center gap-2 rounded-xl bg-muted/40 px-4 py-2.5">
