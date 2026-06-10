@@ -159,7 +159,7 @@ export function useAttendance() {
         const msg = err instanceof Error
           ? err.message
           : (err && typeof err === "object" && "message" in err)
-            ? String((err as any).message)
+            ? String((err as { message: string }).message)
             : "Unknown error"
         console.error("upsertAttendance error:", msg)
         toast("Failed to save: " + msg, "error")
@@ -192,7 +192,7 @@ export function useAttendance() {
         const msg = err instanceof Error
           ? err.message
           : (err && typeof err === "object" && "message" in err)
-            ? String((err as any).message)
+            ? String((err as { message: string }).message)
             : "Delete failed"
         toast("Delete failed: " + msg, "error")
         throw err

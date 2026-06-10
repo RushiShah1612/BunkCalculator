@@ -41,7 +41,7 @@ export function useSubjects() {
       const errorMsg = err instanceof Error
         ? err.message
         : (err && typeof err === "object" && "message" in err)
-          ? String((err as any).message)
+          ? String((err as { message: string }).message)
           : String(err)
       console.error("Error fetching subjects:", errorMsg)
       setError(errorMsg)
@@ -105,7 +105,7 @@ export function useSubjects() {
       const errorMsg = err instanceof Error
         ? err.message
         : (err && typeof err === "object" && "message" in err)
-          ? String((err as any).message)
+          ? String((err as { message: string }).message)
           : String(err)
       console.error("Error creating subject:", errorMsg)
       setError(errorMsg)
@@ -211,7 +211,7 @@ export function useSubjects() {
       const errorMsg = err instanceof Error
         ? err.message
         : (err && typeof err === "object" && "message" in err)
-          ? String((err as any).message)
+          ? String((err as { message: string }).message)
           : String(err)
       console.error("Error updating subject:", errorMsg)
       setError(errorMsg)
@@ -239,7 +239,7 @@ export function useSubjects() {
       const errorMsg = err instanceof Error
         ? err.message
         : (err && typeof err === "object" && "message" in err)
-          ? String((err as any).message)
+          ? String((err as { message: string }).message)
           : String(err)
       console.error("Error deleting subject:", errorMsg)
       setError(errorMsg)
