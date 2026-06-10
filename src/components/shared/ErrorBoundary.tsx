@@ -41,9 +41,11 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-sm text-muted-foreground">
               An unexpected error occurred in this section.
             </p>
-            {import.meta.env.DEV && this.state.error && (
+            {this.state.error && (
               <pre className="mt-3 text-left text-[11px] bg-muted/50 rounded-xl p-3 max-w-xl overflow-x-auto text-red-400">
                 {this.state.error.message}
+                {"\n\n"}
+                {this.state.error.stack}
               </pre>
             )}
           </div>
