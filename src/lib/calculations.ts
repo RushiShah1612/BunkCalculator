@@ -116,12 +116,12 @@ export function calculateClassesNeeded(
   hoursPerSession: number
 ): number {
   // Suppress unused parameter warning
-  void hoursHeld
+  void totalSemesterHours
 
   if (hoursPerSession <= 0) return 0
 
   const minFraction = minAttendancePercent / 100
-  const currentPerc = calculateCurrentPercentage(hoursPresent, totalSemesterHours)
+  const currentPerc = calculateCurrentPercentage(hoursPresent, hoursHeld)
 
   // Already meeting requirement
   if (currentPerc >= minAttendancePercent) return 0
@@ -131,7 +131,7 @@ export function calculateClassesNeeded(
   if (denominator <= 0) return 999
 
   const neededHours = Math.ceil(
-    (minFraction * totalSemesterHours - hoursPresent) / (1 - minFraction)
+    (minFraction * hoursHeld - hoursPresent) / (1 - minFraction)
   )
   if (neededHours <= 0) return 0
 
