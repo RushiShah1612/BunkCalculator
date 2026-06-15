@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom"
+import { NavLink, Link } from "react-router-dom"
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -31,14 +31,14 @@ export function Sidebar() {
       {/* Desktop Sidebar (Left Panel) */}
       <aside className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 border-r border-border bg-card/65 backdrop-blur-md z-20">
         {/* Brand Logo Header */}
-        <div className="flex items-center space-x-3 h-16 px-6 border-b border-border">
+        <Link to="/" className="flex items-center space-x-3 h-16 px-6 border-b border-border hover:opacity-80 transition-opacity">
           <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
             <GraduationCap className="w-5 h-5" />
           </div>
           <span className="font-bold text-lg text-foreground tracking-tight">
             RollCall
           </span>
-        </div>
+        </Link>
 
         {/* Navigation Links */}
         <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">

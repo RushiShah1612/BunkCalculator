@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Sun, Moon, LogOut, User } from "lucide-react"
+import { Sun, Moon, LogOut, User, GraduationCap } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../../hooks/useAuth"
 import { Button } from "../ui/button"
@@ -35,9 +35,24 @@ export function Navbar({ title }: NavbarProps) {
   return (
     <>
       <header className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 border-b border-border bg-background/80 backdrop-blur-md">
-        <h1 className="text-xl font-bold text-foreground md:text-2xl m-0 tracking-tight">
-          {title}
-        </h1>
+        <div className="flex items-center space-x-2.5">
+          {/* Brand Logo & Name (Visible on mobile/tablet, hidden on desktop screens with sidebar) */}
+          <Link to="/" className="flex items-center space-x-2 md:hidden hover:opacity-80 transition-opacity">
+            <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/10">
+              <GraduationCap className="w-4 h-4" />
+            </div>
+            <span className="font-bold text-base text-foreground tracking-tight">
+              RollCall
+            </span>
+          </Link>
+
+          {/* Separator between brand name and page title (mobile only) */}
+          <span className="hidden xs:inline md:hidden text-muted-foreground/30 font-light text-lg">/</span>
+
+          <h1 className="text-lg font-bold text-foreground md:text-2xl m-0 tracking-tight">
+            {title}
+          </h1>
+        </div>
 
         <div className="flex items-center space-x-3">
           {/* Theme Toggle */}
