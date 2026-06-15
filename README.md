@@ -80,6 +80,25 @@ Built using a modern tech stack—**React, TypeScript, Tailwind CSS, Zustand, an
 
 ---
 
+## 🗺️ Application Flow
+
+```mermaid
+graph TD
+    UI[React Components & Pages] -- 1. Triggers Action --> Store[Zustand Store]
+    Store -- 2. Runs Math --> Calc[Calculations Engine]
+    Calc -- 3. Returns Stats --> Store
+    Store -- 4. Updates State --> UI
+    Store -- 5. Syncs / Mutates --> DB[(Supabase PostgreSQL)]
+    DB -- 6. Pulls Profile & Data --> Store
+
+    style UI fill:#6366f1,stroke:#4f46e5,stroke-width:2px,color:#fff
+    style Store fill:#443e38,stroke:#2d2925,stroke-width:2px,color:#fff
+    style Calc fill:#10b981,stroke:#059669,stroke-width:2px,color:#fff
+    style DB fill:#3ecf8e,stroke:#10b981,stroke-width:2px,color:#fff
+```
+
+---
+
 ## 📐 Calculations Logic
 
 The core calculations engine ([calculations.ts](file:///c:/Users/rushi/Videos/PROJECTS/ATTENDANCE/src/lib/calculations.ts)) handles the key arithmetic:
