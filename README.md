@@ -1,5 +1,25 @@
 # 📅 RollCall — Premium Student Attendance Tracker & Bunk Simulator
 
+[![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD627)](https://vite.dev)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Zustand](https://img.shields.io/badge/Zustand-443e38?style=for-the-badge)](https://zustand-demo.pmnd.rs/)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Vitest](https://img.shields.io/badge/Vitest-729B1B?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)
+[![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)](https://web.dev/explore/progressive-web-apps)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
+## 📖 Table of Contents
+- [✨ Features](#features)
+- [🛠️ Technology Stack](#technology-stack)
+- [📦 Project Architecture](#project-architecture)
+- [🗺️ Application Flow](#application-flow)
+- [📐 Calculations Logic](#calculations-logic)
+- [🚀 Setup & Installation](#setup--installation)
+- [🧪 Testing & Code Quality](#testing--code-quality)
+- [📄 License](#license)
+
 RollCall is a premium, feature-rich Progressive Web App (PWA) designed for college and university students to track daily attendance, monitor progress, simulate absent/present scenarios, and prevent detentions. 
 
 Built using a modern tech stack—**React, TypeScript, Tailwind CSS, Zustand, and Supabase**—it provides a dark-themed, glassmorphic UI, responsive analytics, and real-time calculations.
