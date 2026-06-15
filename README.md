@@ -35,6 +35,9 @@ Built using a modern tech stack—**React, TypeScript, Tailwind CSS, Zustand, an
 - **📊 Responsive Analytics & Heatmaps:** Charts built with Recharts (Line, Bar, and Pie) depicting attendance trends over time, subject comparison rates, class type breakdowns, and intensity heatmaps.
 - **📢 Smart Notifications:** Real-time warnings, tips, and alerts that appear in a notification bell popover when a subject falls near or below target levels.
 - **🧪 Demo Data Seeder:** A one-click demo data seeder on the empty dashboard state to instantly populate 4 subjects and 60 days of mock weekday logs (~80% attendance rate) to try out the app.
+  > [!TIP]
+  > If you want to preview the charts and calendars immediately, use the one-click **Demo Data Seeder** button on the empty dashboard state to instantly populate mock subjects and logs.
+- **🔗 Click-to-Home Brand Navigation:** Clicking the "RollCall" brand logo or text in the top-left of the user interface (sidebar on desktop, navbar on mobile) immediately routes the user back to the main menu/dashboard.
 - **🔗 Shareable Public Reports:** Generate secure snapshot links (valid for 7 days) of your overall attendance statistics to share publicly without requiring authentication.
 - **📱 PWA & Offline Support:** Desktop and mobile standalone installation support with full asset caching via service workers.
 - **⚠️ Defensive Crash Recovery:** Global error boundaries that catch layout-level rendering exceptions and provide single-click session recovery.
@@ -139,6 +142,9 @@ npm install
 1. Create a project at [supabase.com](https://supabase.com).
 2. Open the **SQL Editor** in the Supabase dashboard and run the entire script found in:
    [`supabase_schema.sql`](file:///c:/Users/rushi/Videos/PROJECTS/ATTENDANCE/supabase_schema.sql)
+
+> [!IMPORTANT]
+> You must run the entire `supabase_schema.sql` script inside the Supabase SQL Editor before running the development server to ensure all tables, Row Level Security (RLS) rules, and custom database triggers are fully provisioned.
 
 ### 3. Setup Local Environment
 Create a `.env.local` file in the project root:
