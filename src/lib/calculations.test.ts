@@ -366,17 +366,32 @@ describe("getStreakCount", () => {
     expect(getStreakCount(records)).toBe(1)
   })
 
-  it("ignores CANCELLED and HOLIDAY records when computing streak", () => {
+  it("ignores CANCELLED and HOLIDAY records, carrying streak over them", () => {
     const today = new Date()
     const yesterday = new Date(today)
     yesterday.setDate(today.getDate() - 1)
+    const dayBefore = new Date(today)
+    dayBefore.setDate(today.getDate() - 2)
 
     const records = [
       makeRecord("PRESENT", localDateStr(today)),
-      makeRecord("CANCELLED", localDateStr(yesterday)), // ignored → no meaningful records
+      makeRecord("CANCELLED", localDateStr(yesterday)), // ignored, skipped over
+      makeRecord("PRESENT", localDateStr(dayBefore)),
     ]
-    // Yesterday has no meaningful records → streak ends → count = 1
-    expect(getStreakCount(records)).toBe(1)
+    expect(getStreakCount(records)).toBe(2)
+  })
+
+  it("skips days with no records (e.g. weekends)", () => {
+    const today = new Date()
+    const threeDaysAgo = new Date(today)
+    threeDaysAgo.setDate(today.getDate() - 3)
+
+    const records = [
+      makeRecord("PRESENT", localDateStr(today)),
+      // no records for yesterday and day before
+      makeRecord("PRESENT", localDateStr(threeDaysAgo)),
+    ]
+    expect(getStreakCount(records)).toBe(2)
   })
 
   it("respects a custom checkDate", () => {

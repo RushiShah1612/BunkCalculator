@@ -383,15 +383,26 @@ export function getStreakCount(
   records: AttendanceRecord[],
   checkDate?: Date
 ): number {
+  if (records.length === 0) return 0
+
   const endDate = checkDate ? new Date(checkDate) : new Date()
   endDate.setHours(0, 0, 0, 0)
 
   // Build a map: dateString → AttendanceRecord[]
   const byDate: Record<string, AttendanceRecord[]> = {}
+  let earliestTime = endDate.getTime()
+  
   for (const record of records) {
     const day = record.date.slice(0, 10) // "YYYY-MM-DD"
     if (!byDate[day]) byDate[day] = []
     byDate[day].push(record)
+    
+    // Track the earliest date in records to prevent infinite loop
+    const recordParts = day.split('-').map(Number)
+    const recordTime = new Date(recordParts[0], recordParts[1] - 1, recordParts[2]).getTime()
+    if (recordTime < earliestTime) {
+      earliestTime = recordTime
+    }
   }
 
   let streak = 0
@@ -405,7 +416,7 @@ export function getStreakCount(
     return `${y}-${m}-${day}`
   }
 
-  while (true) {
+  while (cursor.getTime() >= earliestTime) {
     const key = toLocalDateStr(cursor)
     const dayRecords = byDate[key] ?? []
 
@@ -420,9 +431,11 @@ export function getStreakCount(
 
     if (hasPresent) {
       streak++
-    } else if (hasOnlyAbsent || meaningful.length === 0) {
-      // No present record today — streak ends
+    } else if (hasOnlyAbsent) {
+      // Only absent today — streak ends
       break
+    } else if (meaningful.length === 0) {
+      // No classes today (e.g. weekend, holiday) — skip and continue backward
     }
 
     // Move one day back
