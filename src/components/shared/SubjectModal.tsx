@@ -105,8 +105,8 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
   })
 
   // Watch form fields for the real-time Summary Box calculation
-  const watchClassTypes = watch("class_types", [])
-  const watchColor = watch("color_tag")
+  const watchClassTypes = watchedClassTypes
+  const watchColor = useWatch({ control, name: "color_tag" })
 
   // Fill form when subject changes (Edit vs Create mode)
   useEffect(() => {
