@@ -12,7 +12,7 @@ import type { SubjectWithStats } from "./useDashboardData"
  * Prevents duplicates by checking if a similar notification was generated in the last 24 hours.
  */
 export function useNotificationAlerts(subjectStats: SubjectWithStats[]) {
-  const { notifications, addNotification } = useNotificationStore()
+  const { addNotification } = useNotificationStore()
 
   useEffect(() => {
     if (!subjectStats || subjectStats.length === 0) return
@@ -27,11 +27,12 @@ export function useNotificationAlerts(subjectStats: SubjectWithStats[]) {
       // 1. Danger Alert
       if (overallStatus === "danger" || overallPct < minAttendance) {
         const title = `Attendance Danger: ${subject.name}`
-        const exists = notifications.some(
-          (n) => n.title === title && now - new Date(n.createdAt).getTime() < oneDayMs
-        )
+        const storageKey = `notify_${title}`
+        const lastTriggered = localStorage.getItem(storageKey)
+        const exists = lastTriggered && now - parseInt(lastTriggered, 10) < oneDayMs
 
         if (!exists) {
+          localStorage.setItem(storageKey, now.toString())
           addNotification({
             type: "danger",
             title,
@@ -42,11 +43,12 @@ export function useNotificationAlerts(subjectStats: SubjectWithStats[]) {
       // 2. Warning Alert
       else if (overallStatus === "warning" || (overallPct >= minAttendance && overallPct < minAttendance + 5)) {
         const title = `Attendance Warning: ${subject.name}`
-        const exists = notifications.some(
-          (n) => n.title === title && now - new Date(n.createdAt).getTime() < oneDayMs
-        )
+        const storageKey = `notify_${title}`
+        const lastTriggered = localStorage.getItem(storageKey)
+        const exists = lastTriggered && now - parseInt(lastTriggered, 10) < oneDayMs
 
         if (!exists) {
+          localStorage.setItem(storageKey, now.toString())
           addNotification({
             type: "warning",
             title,
@@ -57,11 +59,12 @@ export function useNotificationAlerts(subjectStats: SubjectWithStats[]) {
       // 3. Safe Bunk Milestone
       else if (totalSafeBunks > 0) {
         const title = `Safe Bunk Hours: ${subject.name}`
-        const exists = notifications.some(
-          (n) => n.title === title && now - new Date(n.createdAt).getTime() < oneDayMs
-        )
+        const storageKey = `notify_${title}`
+        const lastTriggered = localStorage.getItem(storageKey)
+        const exists = lastTriggered && now - parseInt(lastTriggered, 10) < oneDayMs
 
         if (!exists) {
+          localStorage.setItem(storageKey, now.toString())
           addNotification({
             type: "success",
             title,
@@ -70,5 +73,5 @@ export function useNotificationAlerts(subjectStats: SubjectWithStats[]) {
         }
       }
     })
-  }, [subjectStats, notifications, addNotification])
+  }, [subjectStats, addNotification])
 }
