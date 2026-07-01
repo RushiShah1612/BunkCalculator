@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Link } from "react-router-dom"
@@ -37,7 +37,7 @@ export default function RegisterPage() {
   const {
     register: registerField,
     handleSubmit,
-    watch,
+    control,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -52,7 +52,7 @@ export default function RegisterPage() {
   })
 
   // Watch password field to compute strength indicator
-  const passwordValue = watch("password", "")
+  const passwordValue = useWatch({ control, name: "password", defaultValue: "" })
 
   // Password strength calculations
   const calculatePasswordStrength = (pwd: string) => {

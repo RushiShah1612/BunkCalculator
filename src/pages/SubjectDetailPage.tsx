@@ -109,7 +109,8 @@ function BunkSimulator({ stats }: BunkSimulatorProps) {
       stats.totalHours,
       stats.minAttendance,
       attendMore,
-      0
+      0,
+      stats.hoursPerSession
     )
   }, [stats, attendMore])
 
@@ -120,7 +121,8 @@ function BunkSimulator({ stats }: BunkSimulatorProps) {
       stats.totalHours,
       stats.minAttendance,
       0,
-      skipMore
+      skipMore,
+      stats.hoursPerSession
     )
   }, [stats, skipMore])
 
@@ -132,7 +134,8 @@ function BunkSimulator({ stats }: BunkSimulatorProps) {
       stats.totalHours,
       stats.minAttendance,
       attendMore,
-      skipMore
+      skipMore,
+      stats.hoursPerSession
     )
   }, [stats, attendMore, skipMore])
 

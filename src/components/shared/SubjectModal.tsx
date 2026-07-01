@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useForm, useFieldArray } from "react-hook-form"
+import { useForm, useFieldArray, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Plus, Trash2, X, AlertCircle, Loader2 } from "lucide-react"
@@ -96,6 +96,12 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
   const { fields, append, remove } = useFieldArray({
     control,
     name: "class_types",
+  })
+
+  const watchedClassTypes = useWatch({
+    control,
+    name: "class_types",
+    defaultValue: fields
   })
 
   // Watch form fields for the real-time Summary Box calculation
@@ -341,9 +347,10 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
 
             <div className="space-y-4">
               {fields.map((field, index) => {
-                const watchName = watch(`class_types.${index}.name`)
-                const watchHours = watch(`class_types.${index}.total_hours`, 0)
-                const watchSessionHours = watch(`class_types.${index}.hours_per_session`, 1)
+                const currentClassType = watchedClassTypes[index] || field
+                const watchName = currentClassType.name
+                const watchHours = currentClassType.total_hours || 0
+                const watchSessionHours = currentClassType.hours_per_session || 1
                 
                 // Sessions expected = totalHours / hoursPerSession
                 const expectedSessions = 
@@ -433,7 +440,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                       </span>
                       <div className="flex flex-wrap gap-1.5 pt-0.5">
                         {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => {
-                          const currentDays = watch(`class_types.${index}.timetable_days`) || []
+                          const currentDays = (watchedClassTypes[index] || field).timetable_days || []
                           const isSelected = currentDays.includes(day)
                           return (
                             <button

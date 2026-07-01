@@ -16,7 +16,7 @@ export function calculateCurrentPercentage(
   hoursPresent: number,
   hoursHeld: number
 ): number {
-  if (hoursHeld === 0) return 0
+  if (hoursHeld === 0) return 100
   return Math.round((hoursPresent / hoursHeld) * 100 * 100) / 100
 }
 
@@ -188,7 +188,8 @@ export function simulateAttendance(
   totalSemesterHours: number,
   minAttendancePercent: number,
   additionalPresent: number,
-  additionalAbsent: number
+  additionalAbsent: number,
+  hoursPerSession: number = 1
 ): {
   projectedPercentage: number
   projectedHeld: number
@@ -196,12 +197,9 @@ export function simulateAttendance(
   status: "safe" | "warning" | "danger"
   safeBunksAfter: number
 } {
-  // Derive hours per session from hoursHeld if possible, else fall back to 1
-  const hoursPerSession = 1
-
-  const projectedPresent = hoursPresent + additionalPresent
+  const projectedPresent = hoursPresent + (additionalPresent * hoursPerSession)
   const projectedHeld =
-    hoursHeld + additionalPresent + additionalAbsent
+    hoursHeld + (additionalPresent * hoursPerSession) + (additionalAbsent * hoursPerSession)
 
   const projectedPercentage =
     projectedHeld > 0

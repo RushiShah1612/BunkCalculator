@@ -44,8 +44,8 @@ function makeRecord(
 // ─── calculateCurrentPercentage ──────────────────────────────────────────────
 
 describe("calculateCurrentPercentage", () => {
-  it("returns 0 when no classes held", () => {
-    expect(calculateCurrentPercentage(0, 0)).toBe(0)
+  it("returns 100 when no classes held", () => {
+    expect(calculateCurrentPercentage(0, 0)).toBe(100)
   })
 
   it("returns 100 when all classes attended", () => {
@@ -196,10 +196,10 @@ describe("simulateAttendance", () => {
     expect(["safe", "warning"]).toContain(status)
   })
 
-  it("returns correct projected present and held counts", () => {
-    const { projectedPresent, projectedHeld } = simulateAttendance(30, 40, 60, 75, 5, 2)
-    expect(projectedPresent).toBe(35)
-    expect(projectedHeld).toBe(47)
+  it("returns correct projected present and held counts with hoursPerSession > 1", () => {
+    const { projectedPresent, projectedHeld } = simulateAttendance(30, 40, 60, 75, 5, 2, 2) // 2 hours/session
+    expect(projectedPresent).toBe(40) // 30 + (5 * 2)
+    expect(projectedHeld).toBe(54) // 40 + (7 * 2) = 54
   })
 
   it("safeBunksAfter is non-negative", () => {
