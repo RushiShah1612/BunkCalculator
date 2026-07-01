@@ -70,7 +70,6 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
     handleSubmit,
     control,
     setValue,
-    watch,
     reset,
     formState: { errors },
   } = useForm<SubjectFormValues>({
