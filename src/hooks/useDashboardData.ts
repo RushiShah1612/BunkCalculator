@@ -33,7 +33,7 @@ export interface DashboardData {
   streak: number
   weeklyData: WeeklyBarEntry[]
   todayRecords: AttendanceRecord[]
-  monthRecords: AttendanceRecord[]
+  allRecords: AttendanceRecord[]
   isLoading: boolean
   error: string | null
   refresh: () => void
@@ -59,9 +59,9 @@ const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 export function useDashboardData(): DashboardData {
   const { user } = useAuthStore()
   const { subjects, fetchSubjects } = useSubjects()
-  const { fetchRecordsByDateRange, fetchRecordsByDate } = useAttendance()
+  const { fetchRecordsByDate, fetchAllRecords } = useAttendance()
 
-  const [monthRecords, setMonthRecords] = useState<AttendanceRecord[]>([])
+  const [allRecords, setAllRecords] = useState<AttendanceRecord[]>([])
   const [todayRecords, setTodayRecords] = useState<AttendanceRecord[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -76,20 +76,15 @@ export function useDashboardData(): DashboardData {
     setError(null)
     try {
       const now = new Date()
-      const year = now.getFullYear()
-      const month = now.getMonth() + 1
-      const startDate = `${year}-${String(month).padStart(2, "0")}-01`
-      const lastDay = new Date(year, month, 0).getDate()
-      const endDate = `${year}-${String(month).padStart(2, "0")}-${lastDay}`
       const todayStr = toLocalDateStr(now)
 
-      const [, monthRecs, todayRecs] = await Promise.all([
+      const [, allRecs, todayRecs] = await Promise.all([
         fetchSubjects(),
-        fetchRecordsByDateRange(startDate, endDate),
+        fetchAllRecords(),
         fetchRecordsByDate(todayStr),
       ])
 
-      setMonthRecords(monthRecs)
+      setAllRecords(allRecs)
       setTodayRecords(todayRecs)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to load dashboard"
@@ -97,7 +92,7 @@ export function useDashboardData(): DashboardData {
     } finally {
       setIsLoading(false)
     }
-  }, [user, fetchSubjects, fetchRecordsByDateRange, fetchRecordsByDate])
+  }, [user, fetchSubjects, fetchAllRecords, fetchRecordsByDate])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -114,17 +109,17 @@ export function useDashboardData(): DashboardData {
     const stats: AttendanceStats[] = []
     for (const subject of subjects) {
       for (const ct of subject.class_types) {
-        stats.push(calculateClassTypeStats(ct, monthRecords, subject.min_attendance))
+        stats.push(calculateClassTypeStats(ct, allRecords, subject.min_attendance))
       }
     }
     return stats
-  }, [subjects, monthRecords])
+  }, [subjects, allRecords])
 
   /** Per-subject rollup stats */
   const subjectStats = useMemo<SubjectWithStats[]>(() => {
     return subjects.map((subject) => {
       const ctStats = subject.class_types.map((ct) =>
-        calculateClassTypeStats(ct, monthRecords, subject.min_attendance)
+        calculateClassTypeStats(ct, allRecords, subject.min_attendance)
       )
       const agg = calculateOverallStats(ctStats)
       const worstStatus: "safe" | "warning" | "danger" =
@@ -142,7 +137,7 @@ export function useDashboardData(): DashboardData {
         totalSafeBunks: agg.totalSafeBunks,
       }
     })
-  }, [subjects, monthRecords])
+  }, [subjects, allRecords])
 
   /** Global aggregated stats */
   const overallStats = useMemo(
@@ -151,7 +146,7 @@ export function useDashboardData(): DashboardData {
   )
 
   /** Consecutive present-day streak */
-  const streak = useMemo(() => getStreakCount(monthRecords), [monthRecords])
+  const streak = useMemo(() => getStreakCount(allRecords), [allRecords])
 
   /** Weekly bar chart data (last 7 days, stacked by subject) */
   const weeklyData = useMemo<WeeklyBarEntry[]>(() => {
@@ -170,7 +165,7 @@ export function useDashboardData(): DashboardData {
       for (const subject of subjects) {
         let hoursPresent = 0
         for (const ct of subject.class_types) {
-          const dayRecs = monthRecords.filter(
+          const dayRecs = allRecords.filter(
             (r) =>
               r.class_type_id === ct.id &&
               r.date.slice(0, 10) === dateStr &&
@@ -184,7 +179,7 @@ export function useDashboardData(): DashboardData {
       entries.push(entry)
     }
     return entries
-  }, [subjects, monthRecords])
+  }, [subjects, allRecords])
 
   return {
     subjects,
@@ -194,7 +189,7 @@ export function useDashboardData(): DashboardData {
     streak,
     weeklyData,
     todayRecords,
-    monthRecords,
+    allRecords,
     isLoading,
     error,
     refresh,
