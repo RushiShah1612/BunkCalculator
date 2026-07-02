@@ -7,7 +7,8 @@ import type { AttendanceRecord, AttendanceStats, ClassTypeConfig } from "../type
  *
  * @param hoursPresent - Total hours the student was present
  * @param hoursHeld    - Total hours classes were held (excludes CANCELLED/HOLIDAY)
- * @returns Percentage rounded to 2 decimal places; 0 if no classes held yet
+ * @returns Percentage rounded to 2 decimal places; 100 if no classes held yet
+ *          (nothing has been missed, so attendance is treated as perfect)
  *
  * @example
  * calculateCurrentPercentage(30, 40) // → 75.00
@@ -92,15 +93,16 @@ export function calculateSafeBunks(
  *
  * Only relevant when the student is currently below the minimum.
  *
- * Formula:
+ * Formula (derived from requiring (present + x) / (held + x) ≥ minFraction,
+ * where x is the extra hours attended — both numerator and denominator grow):
  *   needed (hours) = ceil(
- *     (minPercent × totalHours − 100 × hoursPresent) / (100 − minPercent)
+ *     (minFraction × hoursHeld − hoursPresent) / (1 − minFraction)
  *   )
  *   needed (sessions) = ceil(needed / hoursPerSession)
  *
  * @param hoursPresent          - Current hours attended
- * @param hoursHeld             - Current hours classes were held (unused in formula but kept for API parity)
- * @param totalSemesterHours    - Total planned hours for the semester
+ * @param hoursHeld             - Current hours classes were held
+ * @param totalSemesterHours    - Total planned hours (unused in formula but kept for API parity)
  * @param minAttendancePercent  - Minimum required attendance percentage (e.g. 75)
  * @param hoursPerSession       - Duration of each session in hours
  * @returns Number of sessions that must be attended; 0 if already above minimum
