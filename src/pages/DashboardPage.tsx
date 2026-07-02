@@ -374,6 +374,7 @@ interface TodayQuickLogProps {
 function TodayQuickLog({ subjects, todayRecords, onRefresh }: TodayQuickLogProps) {
   const { upsertAttendance } = useAttendance()
   const [saving, setSaving] = useState<string | null>(null)
+  const [savingAll, setSavingAll] = useState(false)
   const today = toLocalDateStr(new Date())
 
   const recordMap = useMemo(() => {
@@ -414,6 +415,25 @@ function TodayQuickLog({ subjects, todayRecords, onRefresh }: TodayQuickLogProps
     }
   }
 
+  const unmarked = allClassTypes.filter((x) => !recordMap[x.ct.id])
+
+  const markAllPresent = async () => {
+    if (unmarked.length === 0) return
+    setSavingAll(true)
+    try {
+      await upsertAttendance(
+        unmarked.map((x) => ({
+          class_type_id: x.ct.id,
+          date: today,
+          status: "PRESENT" as AttendanceStatus,
+        }))
+      )
+      onRefresh()
+    } finally {
+      setSavingAll(false)
+    }
+  }
+
   if (allClassTypes.length === 0) return null
 
   return (
@@ -424,7 +444,20 @@ function TodayQuickLog({ subjects, todayRecords, onRefresh }: TodayQuickLogProps
           <span className="text-sm font-semibold">All caught up! Everything is marked for today. 🎉</span>
         </div>
       ) : (
-        allClassTypes.map(({ subject, ct }) => {
+        <>
+          {unmarked.length > 1 && (
+            <div className="flex justify-end pb-1">
+              <button
+                onClick={markAllPresent}
+                disabled={savingAll}
+                className="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-green-600 text-white hover:bg-green-700 disabled:opacity-60 transition-colors flex items-center gap-1.5"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                {savingAll ? "Marking…" : `Mark all present (${unmarked.length})`}
+              </button>
+            </div>
+          )}
+          {allClassTypes.map(({ subject, ct }) => {
           const status = recordMap[ct.id]
           return (
             <div
@@ -470,7 +503,8 @@ function TodayQuickLog({ subjects, todayRecords, onRefresh }: TodayQuickLogProps
               )}
             </div>
           )
-        })
+        })}
+        </>
       )}
     </div>
   )
