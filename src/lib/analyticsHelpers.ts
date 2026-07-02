@@ -131,7 +131,7 @@ export function buildTimeSeriesData(
 
     for (const sub of filteredSubjects) {
       const pct = held[sub.id] > 0
-        ? Math.round((present[sub.id] / held[sub.id]) * 100 * 10) / 10
+        ? Math.round((present[sub.id] / held[sub.id]) * 100 * 100) / 100
         : 0
       point[sub.id] = pct
     }
@@ -178,8 +178,8 @@ export function buildSubjectComparisonData(
     .map((s) => ({
       subject: bySubject[s.id].name,
       subjectId: s.id,
-      hoursPresent: Math.round(bySubject[s.id].present * 10) / 10,
-      hoursAbsent: Math.round(bySubject[s.id].absent * 10) / 10,
+      hoursPresent: Math.round(bySubject[s.id].present * 100) / 100,
+      hoursAbsent: Math.round(bySubject[s.id].absent * 100) / 100,
       color: bySubject[s.id].color,
     }))
 }
