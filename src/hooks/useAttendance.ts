@@ -203,6 +203,41 @@ export function useAttendance() {
     [deleteAttendanceRecord, setLoading, toast]
   )
 
+  // ─── deleteRecordsBatch ───────────────────────────────────────────────────
+
+  /**
+   * Delete a batch of attendance records by class_type_id and date.
+   */
+  const deleteRecordsBatch = useCallback(
+    async (ctIds: string[], date: string): Promise<void> => {
+      if (!user || ctIds.length === 0) return
+      setLoading(true)
+      try {
+        const { error } = await supabase
+          .from("attendance_records")
+          .delete()
+          .in("class_type_id", ctIds)
+          .eq("date", date)
+
+        if (error) throw error
+        
+        // Remove from local store
+        for (const ctId of ctIds) {
+          const toRemove = attendanceRecords.filter((r) => r.class_type_id === ctId && r.date === date)
+          for (const r of toRemove) {
+            deleteAttendanceRecord(r.id)
+          }
+        }
+      } catch (err: unknown) {
+        console.error("deleteRecordsBatch error:", err)
+        throw err
+      } finally {
+        setLoading(false)
+      }
+    },
+    [user, attendanceRecords, deleteAttendanceRecord, setLoading]
+  )
+
   // ─── fetchMonthSummary ────────────────────────────────────────────────────
 
   /**
@@ -283,6 +318,7 @@ export function useAttendance() {
     deleteRecord,
     fetchMonthSummary,
     fetchAllRecords,
+    deleteRecordsBatch,
     // Legacy compat
     updateAttendanceRecord,
     deleteAttendanceRecord,

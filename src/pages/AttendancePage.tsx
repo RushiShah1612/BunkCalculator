@@ -679,6 +679,7 @@ export default function AttendancePage() {
     fetchRecordsByDate,
     fetchMonthSummary,
     upsertAttendance,
+    deleteRecordsBatch,
   } = useAttendance()
 
   const visibleSubjects = useMemo(() => {
@@ -781,6 +782,7 @@ export default function AttendancePage() {
     setSaving(true)
     try {
       const payload: Parameters<typeof upsertAttendance>[0] = []
+      const ctIdsToDelete: string[] = []
       for (const [ctId, entry] of Object.entries(entriesToSave)) {
         if (entry.status) {
           payload.push({
@@ -789,10 +791,18 @@ export default function AttendancePage() {
             status: entry.status,
             notes: entry.notes || undefined,
           })
+        } else {
+          ctIdsToDelete.push(ctId)
         }
       }
-      if (payload.length === 0) return
-      await upsertAttendance(payload)
+      
+      if (payload.length > 0) {
+        await upsertAttendance(payload)
+      }
+      if (ctIdsToDelete.length > 0) {
+        await deleteRecordsBatch(ctIdsToDelete, dateStr)
+      }
+      
       // Refresh month summary dots
       const [y, m] = dateStr.split("-").map(Number)
       loadMonthSummary(y, m)
@@ -961,7 +971,7 @@ export default function AttendancePage() {
                   <div className="flex flex-wrap items-center gap-3 pt-2">
                     <Button
                       onClick={() => handleSave()}
-                      disabled={saving || markedCount === 0}
+                      disabled={saving}
                       className="rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2"
                     >
                       {saving ? (
