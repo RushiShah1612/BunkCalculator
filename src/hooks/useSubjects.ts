@@ -70,6 +70,7 @@ export function useSubjects() {
           color_tag: subjectData.color_tag,
           credits: subjectData.credits || null,
           semester: subjectData.semester || null,
+          start_date: subjectData.start_date || null,
           min_attendance: subjectData.min_attendance,
         })
         .select()
@@ -135,6 +136,7 @@ export function useSubjects() {
           color_tag: subjectData.color_tag,
           credits: subjectData.credits || null,
           semester: subjectData.semester || null,
+          start_date: subjectData.start_date || null,
           min_attendance: subjectData.min_attendance,
         })
         .eq("id", id)

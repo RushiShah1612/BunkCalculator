@@ -132,6 +132,19 @@ export default function SettingsPage() {
           .update({ is_archived: true } as Record<string, unknown>)
           .in("id", ids)
       }
+      
+      // Clear the semester in the user profile so they can start fresh
+      if (user) {
+        await supabase
+          .from("profiles")
+          .update({ semester: null } as Record<string, unknown>)
+          .eq("id", user.id)
+          
+        if (profile) {
+          setProfile({ ...profile, semester: null })
+        }
+      }
+
       toast("Semester archived! Start adding new subjects.", "success")
       setArchiveOpen(false)
       // Reload page to clear store

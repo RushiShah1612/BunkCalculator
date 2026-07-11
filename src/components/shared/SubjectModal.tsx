@@ -48,6 +48,7 @@ const subjectFormSchema = z.object({
   code: z.string().optional(),
   credits: z.coerce.number().optional(),
   semester: z.string().optional(),
+  start_date: z.string().optional(),
   color_tag: z.string().min(1, "Color tag is required"),
   min_attendance: z.coerce.number().min(1, "Must be >= 1").max(100, "Max 100"),
   class_types: z.array(classTypeFormSchema).min(1, "At least one class type is required"),
@@ -82,6 +83,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
       code: "",
       credits: undefined,
       semester: "",
+      start_date: new Date().toISOString().split("T")[0],
       color_tag: PRESET_COLORS[0].hex,
       min_attendance: defaultMinAttendance,
       class_types: [
@@ -119,6 +121,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
           code: subject.code || "",
           credits: subject.credits || undefined,
           semester: subject.semester || "",
+          start_date: subject.start_date || new Date().toISOString().split("T")[0],
           color_tag: subject.color_tag,
           min_attendance: subject.min_attendance ?? defaultMinAttendance,
           class_types: subject.class_types.map((ct) => {
@@ -139,6 +142,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
           code: "",
           credits: undefined,
           semester: "",
+          start_date: new Date().toISOString().split("T")[0],
           color_tag: PRESET_COLORS[0].hex,
           min_attendance: defaultMinAttendance,
           class_types: [
@@ -170,6 +174,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
       credits: data.credits || null,
       code: data.code || null,
       semester: data.semester || null,
+      start_date: data.start_date || null,
       min_attendance: data.min_attendance,
       class_types: formattedClassTypes,
     }
@@ -265,6 +270,17 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                   type="text"
                   placeholder="e.g. Semester 4"
                   {...registerField("semester")}
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 pl-1">
+                  Classes Start Date
+                </label>
+                <input
+                  type="date"
+                  {...registerField("start_date")}
                   className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                 />
               </div>

@@ -24,6 +24,7 @@ export interface Subject {
   color_tag: string
   credits: number | null
   semester: string | null
+  start_date?: string
   min_attendance: number      // default 75
   class_types: ClassTypeConfig[]
   created_at: string

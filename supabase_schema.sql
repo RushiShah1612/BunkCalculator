@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS public.subjects (
   color_tag TEXT NOT NULL DEFAULT '#6366f1',
   credits INTEGER,
   semester TEXT,
+  start_date DATE DEFAULT CURRENT_DATE,
   min_attendance NUMERIC NOT NULL DEFAULT 75,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
