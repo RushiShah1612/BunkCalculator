@@ -76,7 +76,7 @@ function SectionCard({
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
-  const { user, profile } = useAuthStore()
+  const { user, profile, setProfile } = useAuthStore()
   const { subjects } = useSubjectStore()
   const { toast } = useToastStore()
 
@@ -93,8 +93,7 @@ export default function SettingsPage() {
 
   // Default min attendance
   const [defaultMin, setDefaultMin] = useState(
-    (profile as (typeof profile & { default_min_attendance?: number }) | null)
-      ?.default_min_attendance ?? 75
+    profile?.default_min_attendance ?? 75
   )
   const [savingMin, setSavingMin] = useState(false)
 
@@ -106,6 +105,11 @@ export default function SettingsPage() {
         .from("profiles")
         .update({ default_min_attendance: defaultMin } as Record<string, unknown>)
         .eq("id", user.id)
+      
+      if (profile) {
+        setProfile({ ...profile, default_min_attendance: defaultMin })
+      }
+      
       toast("Default updated!", "success")
     } catch {
       toast("Save failed", "error")

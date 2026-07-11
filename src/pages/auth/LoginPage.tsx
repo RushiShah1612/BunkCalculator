@@ -108,7 +108,7 @@ export default function LoginPage() {
               placeholder="name@university.edu"
               {...registerField("email")}
               aria-describedby={errors.email ? "email-error" : undefined}
-              className={`w-full px-4 py-3 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+              className={`w-full px-4 py-3 rounded-xl border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                 errors.email ? "border-danger focus:ring-danger/50" : "border-border"
               }`}
             />
@@ -139,7 +139,7 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 {...registerField("password")}
                 aria-describedby={errors.password ? "password-error" : undefined}
-                className={`w-full px-4 py-3 pr-10 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+                className={`w-full px-4 py-3 pr-10 rounded-xl border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                   errors.password ? "border-danger focus:ring-danger/50" : "border-border"
                 }`}
               />

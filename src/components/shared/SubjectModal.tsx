@@ -11,6 +11,7 @@ import {
 } from "../ui/dialog"
 import { Button } from "../ui/button"
 import type { Subject } from "../../types"
+import { useAuthStore } from "../../store/authStore"
 
 // 12 Preset Colors
 const PRESET_COLORS = [
@@ -64,6 +65,8 @@ interface SubjectModalProps {
 
 export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: SubjectModalProps) {
   const isEdit = !!subject
+  const { profile } = useAuthStore()
+  const defaultMinAttendance = profile?.default_min_attendance ?? 75
 
   const {
     register: registerField,
@@ -80,7 +83,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
       credits: undefined,
       semester: "",
       color_tag: PRESET_COLORS[0].hex,
-      min_attendance: 75,
+      min_attendance: defaultMinAttendance,
       class_types: [
         {
           name: "Theory",
@@ -117,7 +120,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
           credits: subject.credits || undefined,
           semester: subject.semester || "",
           color_tag: subject.color_tag,
-          min_attendance: subject.min_attendance ?? 75,
+          min_attendance: subject.min_attendance ?? defaultMinAttendance,
           class_types: subject.class_types.map((ct) => {
             const isStandard = ["Theory", "Lab", "Tutorial", "Seminar", "Project"].includes(ct.name)
             return {
@@ -137,7 +140,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
           credits: undefined,
           semester: "",
           color_tag: PRESET_COLORS[0].hex,
-          min_attendance: 75,
+          min_attendance: defaultMinAttendance,
           class_types: [
             {
               name: "Theory",
@@ -219,7 +222,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                   type="text"
                   placeholder="e.g. Mathematics IV"
                   {...registerField("name")}
-                  className={`w-full px-4 py-2.5 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+                  className={`w-full px-4 py-2.5 rounded-xl border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                     errors.name ? "border-danger focus:ring-danger/50" : "border-border"
                   }`}
                 />
@@ -238,7 +241,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                   type="text"
                   placeholder="e.g. MATH301"
                   {...registerField("code")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                 />
               </div>
 
@@ -250,7 +253,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                   type="number"
                   placeholder="e.g. 4"
                   {...registerField("credits")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                 />
               </div>
 
@@ -262,7 +265,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                   type="text"
                   placeholder="e.g. Semester 4"
                   {...registerField("semester")}
-                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                 />
               </div>
 
@@ -274,7 +277,7 @@ export function SubjectModal({ isOpen, onClose, onSubmit, subject, loading }: Su
                   type="number"
                   placeholder="75"
                   {...registerField("min_attendance")}
-                  className={`w-full px-4 py-2.5 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+                  className={`w-full px-4 py-2.5 rounded-xl border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                     errors.min_attendance ? "border-danger focus:ring-danger/50" : "border-border"
                   }`}
                 />

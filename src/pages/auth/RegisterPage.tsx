@@ -182,7 +182,7 @@ export default function RegisterPage() {
               placeholder="John Doe"
               {...registerField("fullName")}
               aria-describedby={errors.fullName ? "fullName-error" : undefined}
-              className={`w-full px-4 py-2.5 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+              className={`w-full px-4 py-2.5 rounded-xl border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                 errors.fullName ? "border-danger focus:ring-danger/50" : "border-border"
               }`}
             />
@@ -203,7 +203,7 @@ export default function RegisterPage() {
               placeholder="name@university.edu"
               {...registerField("email")}
               aria-describedby={errors.email ? "email-error" : undefined}
-              className={`w-full px-4 py-2.5 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+              className={`w-full px-4 py-2.5 rounded-xl border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                 errors.email ? "border-danger focus:ring-danger/50" : "border-border"
               }`}
             />
@@ -224,7 +224,7 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Vite University"
                 {...registerField("institution")}
-                className="w-full px-4 py-2.5 rounded-xl border border-border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
             </div>
 
@@ -237,7 +237,7 @@ export default function RegisterPage() {
                 type="text"
                 placeholder="Semester 4"
                 {...registerField("semester")}
-                className="w-full px-4 py-2.5 rounded-xl border border-border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
               />
             </div>
           </div>
@@ -253,7 +253,7 @@ export default function RegisterPage() {
                 placeholder="••••••••"
                 {...registerField("password")}
                 aria-describedby={errors.password ? "password-error" : undefined}
-                className={`w-full px-4 py-2.5 pr-10 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+                className={`w-full px-4 py-2.5 pr-10 rounded-xl border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                   errors.password ? "border-danger focus:ring-danger/50" : "border-border"
                 }`}
               />
@@ -300,7 +300,7 @@ export default function RegisterPage() {
                 placeholder="••••••••"
                 {...registerField("confirmPassword")}
                 aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
-                className={`w-full px-4 py-2.5 pr-10 rounded-xl border bg-background/50 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
+                className={`w-full px-4 py-2.5 pr-10 rounded-xl border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all ${
                   errors.confirmPassword ? "border-danger focus:ring-danger/50" : "border-border"
                 }`}
               />

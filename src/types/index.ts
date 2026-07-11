@@ -65,5 +65,6 @@ export interface UserProfile {
   full_name: string
   institution: string | null
   semester: string | null
+  default_min_attendance?: number
   created_at: string
 }
