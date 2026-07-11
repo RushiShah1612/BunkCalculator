@@ -931,6 +931,20 @@ export default function SubjectDetailPage() {
   const [calYear, setCalYear] = useState(today.getFullYear())
   const [calMonth, setCalMonth] = useState(today.getMonth() + 1)
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
+  
+  const [hasInitCalendar, setHasInitCalendar] = useState(false)
+  useEffect(() => {
+    if (subject && !hasInitCalendar) {
+      if (subject.start_date) {
+        const [y, m] = subject.start_date.split("-").map(Number)
+        if (y && m) {
+          setCalYear(y)
+          setCalMonth(m)
+        }
+      }
+      setHasInitCalendar(true)
+    }
+  }, [subject, hasInitCalendar])
 
   // Modal state
   const [editModalOpen, setEditModalOpen] = useState(false)

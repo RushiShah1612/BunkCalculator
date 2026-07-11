@@ -393,6 +393,7 @@ function TodayQuickLog({ subjects, todayRecords, onRefresh }: TodayQuickLogProps
   const allClassTypes = useMemo(() => {
     const list = []
     for (const s of subjects) {
+      if (s.start_date && s.start_date > today) continue
       for (const ct of s.class_types) {
         if (ct.timetable_days && ct.timetable_days.length > 0 && !ct.timetable_days.includes(todayDayName)) {
           continue
@@ -401,7 +402,7 @@ function TodayQuickLog({ subjects, todayRecords, onRefresh }: TodayQuickLogProps
       }
     }
     return list
-  }, [subjects, todayDayName])
+  }, [subjects, todayDayName, today])
 
   const allMarked = allClassTypes.length > 0 && allClassTypes.every((x) => recordMap[x.ct.id])
 

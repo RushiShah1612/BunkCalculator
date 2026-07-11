@@ -621,7 +621,9 @@ function QuickMarkSheet({ isOpen, onClose, subjects, onSave, saving }: QuickMark
               Add subjects first to log attendance.
             </p>
           )}
-          {subjects.map((sub) => (
+          {subjects
+            .filter((sub) => !sub.start_date || date >= sub.start_date)
+            .map((sub) => (
             <SubjectBlock
               key={sub.id}
               subject={sub}
@@ -680,9 +682,10 @@ export default function AttendancePage() {
   } = useAttendance()
 
   const visibleSubjects = useMemo(() => {
-    if (!filterByTimetable) return subjects
+    const validSubjects = subjects.filter(sub => !sub.start_date || selectedDate >= sub.start_date)
+    if (!filterByTimetable) return validSubjects
     const selectedDayName = getDayName(selectedDate)
-    return subjects
+    return validSubjects
       .map((sub) => {
         const filteredClassTypes = sub.class_types.filter(
           (ct) =>
