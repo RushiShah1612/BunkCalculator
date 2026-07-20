@@ -372,15 +372,15 @@ function StatsCard({ stats, color, onMinChange }: StatsCardProps) {
               Present
             </p>
             <p className="text-sm font-bold text-foreground">
-              {stats.hoursPresent}h
+              {Math.round(stats.hoursPresent / stats.hoursPerSession)}
             </p>
-            <p className="text-[10px] text-muted-foreground">of {stats.hoursHeld}h held</p>
+            <p className="text-[10px] text-muted-foreground">of {Math.round(stats.hoursHeld / stats.hoursPerSession)} held</p>
           </div>
           <div className="rounded-xl bg-muted/40 p-3 text-center">
             <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide mb-1">
               Semester
             </p>
-            <p className="text-sm font-bold text-foreground">{stats.totalHours}h</p>
+            <p className="text-sm font-bold text-foreground">{Math.round(stats.totalHours / stats.hoursPerSession)}</p>
             <p className="text-[10px] text-muted-foreground">total planned</p>
           </div>
           <div className="rounded-xl bg-muted/40 p-3 text-center">
@@ -405,7 +405,12 @@ function StatsCard({ stats, color, onMinChange }: StatsCardProps) {
             <div className="flex items-center gap-2 rounded-xl bg-green-500/10 border border-green-500/20 px-4 py-3">
               <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
               <p className="text-sm font-medium text-green-700 dark:text-green-400">
-                You can safely miss <strong>{stats.safeBunks}</strong> more hour{stats.safeBunks !== 1 ? "s" : ""}
+                {(() => {
+                  const safeSessionCount = Math.round(stats.safeBunks / stats.hoursPerSession)
+                  return (
+                    <>You can safely miss <strong>{safeSessionCount}</strong> more class{safeSessionCount !== 1 ? "es" : ""}</>
+                  )
+                })()}
               </p>
             </div>
             <div className="flex items-center gap-2 rounded-xl bg-muted/40 px-4 py-2.5">
