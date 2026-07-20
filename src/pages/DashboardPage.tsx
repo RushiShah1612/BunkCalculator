@@ -395,7 +395,7 @@ function TodayQuickLog({ subjects, todayRecords, onRefresh }: TodayQuickLogProps
     for (const s of subjects) {
       if (s.start_date && s.start_date > today) continue
       for (const ct of s.class_types) {
-        if (ct.timetable_days && ct.timetable_days.length > 0 && !ct.timetable_days.includes(todayDayName)) {
+        if (!ct.timetable_days || ct.timetable_days.length === 0 || !ct.timetable_days.includes(todayDayName)) {
           continue
         }
         list.push({ subject: s, ct })

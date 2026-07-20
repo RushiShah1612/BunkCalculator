@@ -245,9 +245,10 @@ describe("calculateOverallStats", () => {
     expect(result.totalSafeBunks).toBe(5)
   })
 
-  it("weights overall percentage by totalHours", () => {
-    // 60% in a 60hr subject and 90% in a 30hr subject
-    // weighted = (60*60 + 90*30) / 90 = (3600 + 2700) / 90 = 70
+  it("calculates overall percentage by total present over total held", () => {
+    // Theory: 18 present / 30 held
+    // Lab: 27 present / 30 held
+    // Total: 45 present / 60 held = 75%
     const statsArray: AttendanceStats[] = [
       {
         classTypeId: "1", classTypeName: "Theory", totalHours: 60,
@@ -263,7 +264,7 @@ describe("calculateOverallStats", () => {
       },
     ]
     const result = calculateOverallStats(statsArray)
-    expect(result.overallPercentage).toBe(70)
+    expect(result.overallPercentage).toBe(75)
   })
 })
 

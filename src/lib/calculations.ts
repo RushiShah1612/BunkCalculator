@@ -254,16 +254,15 @@ export function calculateOverallStats(statsArray: AttendanceStats[]): {
     }
   }
 
-  let weightedSum = 0
-  let totalWeight = 0
+  let totalHeld = 0
+  let totalPresent = 0
   let totalSafeBunks = 0
   let subjectsAtRisk = 0
   let subjectsInWarning = 0
 
   for (const stats of statsArray) {
-    const weight = stats.totalHours
-    weightedSum += stats.currentPercentage * weight
-    totalWeight += weight
+    totalHeld += stats.hoursHeld
+    totalPresent += stats.hoursPresent
     totalSafeBunks += stats.safeBunks
 
     if (stats.status === "danger") subjectsAtRisk++
@@ -271,9 +270,9 @@ export function calculateOverallStats(statsArray: AttendanceStats[]): {
   }
 
   const overallPercentage =
-    totalWeight > 0
-      ? Math.round((weightedSum / totalWeight) * 100) / 100
-      : 0
+    totalHeld > 0
+      ? Math.round((totalPresent / totalHeld) * 100 * 100) / 100
+      : 100
 
   return {
     overallPercentage,
@@ -457,6 +456,8 @@ export interface SubjectStatsSummary {
   currentPercentage: number
   totalHeld: number
   totalPresent: number
+  heldSessions: number
+  presentSessions: number
   status: "safe" | "warning" | "danger"
 }
 
@@ -470,6 +471,8 @@ export function calculateSubjectStats(
 ): SubjectStatsSummary {
   let totalHeld = 0
   let totalPresent = 0
+  let heldSessions = 0
+  let presentSessions = 0
   let hasDanger = false
   let hasWarning = false
 
@@ -479,6 +482,8 @@ export function calculateSubjectStats(
     const stats = calculateClassTypeStats(config, records, minAttendance)
     totalHeld += stats.hoursHeld
     totalPresent += stats.hoursPresent
+    heldSessions += Math.round(stats.hoursHeld / config.hours_per_session)
+    presentSessions += Math.round(stats.hoursPresent / config.hours_per_session)
     if (stats.status === "danger") hasDanger = true
     if (stats.status === "warning") hasWarning = true
   }
@@ -493,6 +498,8 @@ export function calculateSubjectStats(
     currentPercentage: Math.round(currentPercentage * 100) / 100,
     totalHeld,
     totalPresent,
+    heldSessions,
+    presentSessions,
     status,
   }
 }
