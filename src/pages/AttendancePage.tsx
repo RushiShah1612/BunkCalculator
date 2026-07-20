@@ -387,7 +387,6 @@ function HistoryTab({ subjects }: HistoryTabProps) {
   const handleDelete = async (id: string) => {
     await deleteRecord(id)
     setRecords((prev) => prev.filter((r) => r.id !== id))
-    setDeleteTarget(null)
   }
 
   return (
