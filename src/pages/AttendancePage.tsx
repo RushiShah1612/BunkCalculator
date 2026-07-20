@@ -623,6 +623,19 @@ function QuickMarkSheet({ isOpen, onClose, subjects, onSave, saving }: QuickMark
           )}
           {subjects
             .filter((sub) => !sub.start_date || date >= sub.start_date)
+            .map((sub) => {
+              const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+              const [y, m, d] = date.split("-").map(Number)
+              const selectedDayName = daysOfWeek[new Date(y, m - 1, d).getDay()]
+              const filteredClassTypes = sub.class_types.filter(
+                (ct) =>
+                  !ct.timetable_days ||
+                  ct.timetable_days.length === 0 ||
+                  ct.timetable_days.includes(selectedDayName)
+              )
+              return { ...sub, class_types: filteredClassTypes }
+            })
+            .filter((sub) => sub.class_types.length > 0)
             .map((sub) => (
             <SubjectBlock
               key={sub.id}
@@ -757,7 +770,7 @@ export default function AttendancePage() {
 
   const handleMarkAllPresent = () => {
     const newEntries: typeof entries = {}
-    for (const sub of subjects) {
+    for (const sub of visibleSubjects) {
       for (const ct of sub.class_types) {
         newEntries[ct.id] = { status: "PRESENT", notes: entries[ct.id]?.notes ?? "" }
       }
@@ -767,7 +780,7 @@ export default function AttendancePage() {
 
   const handleClearAll = () => {
     const newEntries: typeof entries = {}
-    for (const sub of subjects) {
+    for (const sub of visibleSubjects) {
       for (const ct of sub.class_types) {
         newEntries[ct.id] = { status: null, notes: "" }
       }
@@ -1021,7 +1034,7 @@ export default function AttendancePage() {
         isOpen={fabOpen}
         onClose={() => setFabOpen(false)}
         subjects={subjects}
-        onSave={handleSave}
+        onSave={async (date, e) => handleSave(date, e)}
         saving={saving}
       />
     </PageWrapper>
