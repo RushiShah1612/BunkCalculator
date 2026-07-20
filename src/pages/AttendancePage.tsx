@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react"
 import { PageWrapper } from "../components/layout/PageWrapper"
 import { StatusBadge } from "../components/shared/StatusBadge"
-import { ConfirmDialog } from "../components/shared/ConfirmDialog"
 import { Button } from "../components/ui/button"
 import { useSubjects } from "../hooks/useSubjects"
 import { useAttendance } from "../hooks/useAttendance"
@@ -342,9 +341,6 @@ function HistoryTab({ subjects }: HistoryTabProps) {
   const [filterStart, setFilterStart] = useState("")
   const [filterEnd, setFilterEnd] = useState("")
 
-  // Delete confirm
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; label: string } | null>(null)
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(true)
@@ -503,12 +499,7 @@ function HistoryTab({ subjects }: HistoryTabProps) {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <button
-                        onClick={() =>
-                          setDeleteTarget({
-                            id: r.id,
-                            label: `${r._subjectName} ${r._ctName} (${r.date})`,
-                          })
-                        }
+                        onClick={() => handleDelete(r.id)}
                         className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 text-muted-foreground hover:text-red-500 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -550,17 +541,6 @@ function HistoryTab({ subjects }: HistoryTabProps) {
           )}
         </div>
       )}
-
-      {/* Delete Confirm */}
-      <ConfirmDialog
-        isOpen={!!deleteTarget}
-        title="Delete Record"
-        description={`Are you sure you want to delete this attendance record? This cannot be undone.`}
-        confirmLabel="Delete"
-        variant="destructive"
-        onConfirm={() => deleteTarget && handleDelete(deleteTarget.id)}
-        onCancel={() => setDeleteTarget(null)}
-      />
     </div>
   )
 }
