@@ -31,7 +31,7 @@ function SubjectCardSkeleton() {
 }
 
 export default function SubjectsPage() {
-  const { subjects, loading, fetchSubjects, createSubject, updateSubject, deleteSubject } = useSubjects()
+  const { activeSubjects: subjects, loading, fetchSubjects, createSubject, updateSubject, deleteSubject } = useSubjects()
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false)

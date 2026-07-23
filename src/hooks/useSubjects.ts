@@ -8,6 +8,7 @@ import type { Subject, ClassTypeConfig } from "../types"
 export function useSubjects() {
   const {
     subjects,
+    activeSubjects,
     isLoading,
     error,
     setSubjects,
@@ -254,6 +255,7 @@ export function useSubjects() {
 
   return {
     subjects,
+    activeSubjects,
     loading: isLoading,
     error,
     fetchSubjects,

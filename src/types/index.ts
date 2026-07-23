@@ -27,6 +27,7 @@ export interface Subject {
   start_date?: string
   min_attendance: number      // default 75
   class_types: ClassTypeConfig[]
+  is_archived?: boolean
   created_at: string
 }
 

@@ -15,13 +15,14 @@ import {
   type ClassTypeBreakdownPoint,
   type HeatmapCell,
 } from "../lib/analyticsHelpers"
-import type { AttendanceRecord, AttendanceStats } from "../types"
+import type { AttendanceRecord, AttendanceStats, Subject } from "../types"
 
 export interface AnalyticsFilters {
   preset: DateRangePreset
   customFrom: string
   customTo: string
   subjectIds: string[]  // empty = all
+  includeArchived: boolean
 }
 
 export interface AnalyticsData {
@@ -36,6 +37,7 @@ export interface AnalyticsData {
   filters: AnalyticsFilters
   setFilters: (f: Partial<AnalyticsFilters>) => void
   refresh: () => void
+  relevantSubjects: Subject[]
 }
 
 const DEFAULT_FILTERS: AnalyticsFilters = {
@@ -43,6 +45,7 @@ const DEFAULT_FILTERS: AnalyticsFilters = {
   customFrom: "",
   customTo: "",
   subjectIds: [],
+  includeArchived: false,
 }
 
 export function useAnalyticsData(): AnalyticsData {
@@ -93,14 +96,22 @@ export function useAnalyticsData(): AnalyticsData {
   }, [filters])
 
   // Filter records by date range + subject selection
+  const relevantSubjects = useMemo(() => {
+    return subjects.filter(s => filters.includeArchived ? true : !s.is_archived)
+  }, [subjects, filters.includeArchived])
+
   const filteredRecords = useMemo(() => {
     const classTypeIds = new Set<string>()
 
     if (filters.subjectIds.length > 0) {
-      for (const sub of subjects) {
+      for (const sub of relevantSubjects) {
         if (filters.subjectIds.includes(sub.id)) {
           for (const ct of sub.class_types) classTypeIds.add(ct.id)
         }
+      }
+    } else {
+      for (const sub of relevantSubjects) {
+        for (const ct of sub.class_types) classTypeIds.add(ct.id)
       }
     }
 
@@ -110,14 +121,14 @@ export function useAnalyticsData(): AnalyticsData {
       if (classTypeIds.size > 0 && !classTypeIds.has(r.class_type_id)) return false
       return true
     })
-  }, [allRecords, filters.subjectIds, subjects, dateRange])
+  }, [allRecords, filters.subjectIds, relevantSubjects, dateRange])
 
   // Compute AttendanceStats for every class type across all subjects
   const allStats = useMemo<AttendanceStats[]>(() => {
     const result: AttendanceStats[] = []
     const filteredSubjects = filters.subjectIds.length > 0
-      ? subjects.filter((s) => filters.subjectIds.includes(s.id))
-      : subjects
+      ? relevantSubjects.filter((s) => filters.subjectIds.includes(s.id))
+      : relevantSubjects
 
     for (const sub of filteredSubjects) {
       for (const ct of sub.class_types) {
@@ -125,20 +136,20 @@ export function useAnalyticsData(): AnalyticsData {
       }
     }
     return result
-  }, [subjects, filteredRecords, filters.subjectIds])
+  }, [relevantSubjects, filteredRecords, filters.subjectIds])
 
   // All class types across subjects
   const allClassTypes = useMemo(
-    () => subjects.flatMap((s) => s.class_types),
-    [subjects]
+    () => relevantSubjects.flatMap((s) => s.class_types),
+    [relevantSubjects]
   )
 
   const filteredSubjects = useMemo(
     () =>
       filters.subjectIds.length > 0
-        ? subjects.filter((s) => filters.subjectIds.includes(s.id))
-        : subjects,
-    [subjects, filters.subjectIds]
+        ? relevantSubjects.filter((s) => filters.subjectIds.includes(s.id))
+        : relevantSubjects,
+    [relevantSubjects, filters.subjectIds]
   )
 
   const timeSeries = useMemo(
@@ -177,5 +188,6 @@ export function useAnalyticsData(): AnalyticsData {
     filters,
     setFilters,
     refresh,
+    relevantSubjects, // exposing this to use in AnalyticsPage
   }
 }

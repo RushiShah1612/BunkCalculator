@@ -666,7 +666,7 @@ export default function AttendancePage() {
     document.title = "Log Attendance | RollCall"
   }, [])
 
-  const { subjects, fetchSubjects } = useSubjects()
+  const { activeSubjects: subjects, fetchSubjects } = useSubjects()
   const {
     fetchRecordsByDate,
     fetchMonthSummary,

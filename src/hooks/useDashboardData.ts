@@ -27,6 +27,7 @@ export interface WeeklyBarEntry {
 
 export interface DashboardData {
   subjects: Subject[]
+  activeSubjects: Subject[]
   subjectStats: SubjectWithStats[]
   allClassTypeStats: AttendanceStats[]
   overallStats: ReturnType<typeof calculateOverallStats>
@@ -58,7 +59,7 @@ const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
  */
 export function useDashboardData(): DashboardData {
   const { user } = useAuthStore()
-  const { subjects, fetchSubjects } = useSubjects()
+  const { subjects, activeSubjects, fetchSubjects } = useSubjects()
   const { fetchRecordsByDate, fetchAllRecords } = useAttendance()
 
   const [allRecords, setAllRecords] = useState<AttendanceRecord[]>([])
@@ -183,6 +184,7 @@ export function useDashboardData(): DashboardData {
 
   return {
     subjects,
+    activeSubjects,
     subjectStats,
     allClassTypeStats,
     overallStats,

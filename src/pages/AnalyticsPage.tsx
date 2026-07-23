@@ -595,6 +595,19 @@ function FiltersBar({ filters, setFilters, subjects }: FiltersBarProps) {
           )
         })}
       </div>
+
+      {/* Include Archived toggle */}
+      <div className="flex items-center gap-2 ml-auto">
+        <label className="text-xs text-muted-foreground flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={filters.includeArchived}
+            onChange={(e) => setFilters({ includeArchived: e.target.checked })}
+            className="rounded border-border text-primary focus:ring-primary/40 bg-background"
+          />
+          Include Archived
+        </label>
+      </div>
     </div>
   )
 }
@@ -898,6 +911,7 @@ export default function AnalyticsPage() {
     filters,
     setFilters,
     refresh,
+    relevantSubjects,
   } = useAnalyticsData()
 
   // Set document title
@@ -914,16 +928,16 @@ export default function AnalyticsPage() {
     if (!user) return
     setShareLoading(true)
     try {
-      // Calculate statistics for each subject in subjects list
-      const overallSubjects = subjects.map(s => {
-        const ctStats = s.class_types.map(ct => calculateClassTypeStats(ct, allRecords, s.min_attendance))
+      // Calculate statistics for each subject in relevantSubjects list
+      const overallSubjects = relevantSubjects.map((s: import("../types").Subject) => {
+        const ctStats = s.class_types.map((ct: import("../types").ClassTypeConfig) => calculateClassTypeStats(ct, allRecords, s.min_attendance))
         const agg = calculateOverallStats(ctStats)
         return {
           name: s.name,
           code: s.code,
           color: s.color_tag,
           percentage: agg.overallPercentage,
-          classTypes: ctStats.map(stat => ({
+          classTypes: ctStats.map((stat: import("../types").AttendanceStats) => ({
             name: stat.classTypeName,
             percentage: stat.currentPercentage,
             attended: stat.hoursPresent,
@@ -933,8 +947,8 @@ export default function AnalyticsPage() {
       })
 
       // Aggregate overall attendance percentage
-      const allClassTypeStats = subjects.flatMap(s => 
-        s.class_types.map(ct => calculateClassTypeStats(ct, allRecords, s.min_attendance))
+      const allClassTypeStats = relevantSubjects.flatMap((s: import("../types").Subject) => 
+        s.class_types.map((ct: import("../types").ClassTypeConfig) => calculateClassTypeStats(ct, allRecords, s.min_attendance))
       )
       const globalOverall = calculateOverallStats(allClassTypeStats).overallPercentage
 
@@ -977,9 +991,9 @@ export default function AnalyticsPage() {
   const filteredSubjects = useMemo(
     () =>
       filters.subjectIds.length > 0
-        ? subjects.filter((s) => filters.subjectIds.includes(s.id))
-        : subjects,
-    [subjects, filters.subjectIds]
+        ? relevantSubjects.filter((s: import("../types").Subject) => filters.subjectIds.includes(s.id))
+        : relevantSubjects,
+    [relevantSubjects, filters.subjectIds]
   )
 
   const userName = profile?.full_name?.replace(/\s+/g, "_") || "student"
@@ -994,7 +1008,7 @@ export default function AnalyticsPage() {
         <div>
           <h2 className="text-xl font-bold text-foreground">Analytics</h2>
           <p className="text-sm text-muted-foreground">
-            {allRecords.length} total records · {subjects.length} subjects
+            {allRecords.length} total records · {relevantSubjects.length} subjects
           </p>
         </div>
         <div className="flex gap-2">
@@ -1012,14 +1026,14 @@ export default function AnalyticsPage() {
             size="sm"
             className="rounded-xl"
             onClick={handleShareReport}
-            disabled={shareLoading || subjects.length === 0}
+            disabled={shareLoading || relevantSubjects.length === 0}
           >
             <Share2 className="w-4 h-4 mr-1.5 text-primary" />
             {shareLoading ? "Sharing..." : "Share"}
           </Button>
           <ExportMenu
             records={filteredRecords}
-            subjects={subjects}
+            subjects={relevantSubjects}
             userName={userName}
           />
         </div>
@@ -1035,7 +1049,7 @@ export default function AnalyticsPage() {
 
       {/* ── Filters ── */}
       <div className="mb-6 no-print" data-no-print>
-        <FiltersBar filters={filters} setFilters={setFilters} subjects={subjects} />
+        <FiltersBar filters={filters} setFilters={setFilters} subjects={relevantSubjects} />
       </div>
 
       {/* ── Charts Grid ── */}
@@ -1095,16 +1109,18 @@ export default function AnalyticsPage() {
           >
             <AttendanceHeatmap heatmap={heatmap} />
           </ChartCard>
+
+          {/* Chart: Detailed Log */}
+          <ChartCard
+            title="Detailed Attendance Log"
+            subtitle="Full history of records"
+            icon={FileText}
+            className="mb-12"
+          >
+            <AttendanceLogTable records={filteredRecords} subjects={relevantSubjects} />
+          </ChartCard>
         </>
       )}
-
-      {/* ── Full Attendance Log ── */}
-      <div>
-        <h2 className="text-lg font-bold text-foreground mb-4">
-          Full Attendance Log
-        </h2>
-        <AttendanceLogTable records={filteredRecords} subjects={subjects} />
-      </div>
     </PageWrapper>
   )
 }
